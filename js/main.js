@@ -4,6 +4,14 @@
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
+/* ---------- fix de altura real de viewport en mobile ---------- */
+function setViewportHeight() {
+  document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
+}
+setViewportHeight();
+window.addEventListener("resize", setViewportHeight);
+window.addEventListener("orientationchange", setViewportHeight);
+
 /* ---------- header al hacer scroll ---------- */
 const header = document.getElementById("site-header");
 const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 40);
