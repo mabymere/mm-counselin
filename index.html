@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mabel Mereles · Counseling</title>
+<meta name="description" content="Mabel Mereles, counselor. Acompañamiento profesional para tu proceso de crecimiento personal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ambient canvas: three.js floating particles, sits behind everything -->
+<canvas id="bg-canvas"></canvas>
+
+<div class="grain"></div>
+
+<header class="site-header" id="site-header">
+  <a href="#top" class="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 40 40" width="30" height="30">
+        <path d="M20 4C20 4 8 14 8 24C8 31 13 36 20 36C27 36 32 31 32 24C32 14 20 4 20 4Z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M20 10C20 10 13 17 13 24C13 28.5 16 32 20 32" fill="none" stroke="currentColor" stroke-width="1.1" opacity="0.6"/>
+      </svg>
+    </span>
+    <span class="brand-text">Mabel Mereles</span>
+  </a>
+
+  <nav class="main-nav" id="main-nav" data-section-root="nav">
+    <a href="#sobre-mi">Sobre mí</a>
+    <a href="#enfoque">Enfoque</a>
+    <a href="#ebooks">Ebooks</a>
+    <a href="#testimonios">Testimonios</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
+
+  <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main id="sections-root">
+
+  <!-- ============ HERO ============ -->
+  <section class="section hero" id="top" data-section="hero">
+    <div class="hero-inner">
+      <p class="eyebrow reveal">Counselor · Espacio de escucha</p>
+      <h1 class="hero-title reveal">
+        Un espacio<br>
+        para <em>encontrarte</em><br>
+        de nuevo.
+      </h1>
+      <p class="hero-lead reveal">
+        Soy Mabel Mereles. Acompaño procesos de counseling con un enfoque
+        humanista: escucha activa, presencia real y herramientas concretas
+        para que vuelvas a elegir vos.
+      </p>
+      <div class="hero-actions reveal">
+        <a href="#contacto" class="btn btn-primary">Agendar una sesión</a>
+        <a href="#sobre-mi" class="btn btn-ghost">Conocer el enfoque</a>
+      </div>
+    </div>
+
+    <div class="hero-portrait reveal">
+      <div class="portrait-frame">
+        <img src="assets/mabel.jpg" alt="Mabel Mereles, counselor">
+        <svg class="portrait-path" viewBox="0 0 320 420" preserveAspectRatio="none">
+          <path d="M20 20 C 300 10, 305 60, 300 210 C 295 380, 260 400, 20 400" fill="none" stroke="#7FAE9C" stroke-width="1"/>
+        </svg>
+      </div>
+      <span class="portrait-caption">Buenos Aires · Sesiones online y presenciales</span>
+    </div>
+
+    <div class="scroll-cue" aria-hidden="true">
+      <span></span>
+      <small>Desplazate</small>
+    </div>
+  </section>
+
+  <!-- ============ SOBRE MI ============ -->
+  <section class="section about" id="sobre-mi" data-section="about">
+    <div class="about-grid">
+      <div class="about-label">
+        <span class="eyebrow reveal">01 — Sobre mí</span>
+      </div>
+      <div class="about-body">
+        <p class="about-text reveal">
+          Trabajo en counseling desde hace más de una década, acompañando
+          personas que atraviesan momentos de cambio, duelo, ansiedad o
+          simplemente necesitan un espacio propio para pensar(se). No doy
+          respuestas cerradas: construyo, junto a cada persona, las
+          preguntas que la ayudan a moverse.
+        </p>
+        <p class="about-text reveal">
+          Mi formación combina el enfoque centrado en la persona, herramientas
+          de terapia breve y una mirada corporal del bienestar. Creo en la
+          escucha sin juicio como punto de partida de cualquier proceso real.
+        </p>
+        <div class="stat-row reveal">
+          <div class="stat">
+            <strong>+10</strong>
+            <span>años de práctica</span>
+          </div>
+          <div class="stat">
+            <strong>+600</strong>
+            <span>procesos acompañados</span>
+          </div>
+          <div class="stat">
+            <strong>100%</strong>
+            <span>confidencial</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ENFOQUE / SERVICIOS ============ -->
+  <section class="section approach" id="enfoque" data-section="approach">
+    <span class="eyebrow reveal">02 — Enfoque</span>
+    <h2 class="section-title reveal">Cómo trabajamos juntas</h2>
+
+    <div class="approach-grid" id="approach-grid">
+      <article class="approach-card reveal">
+        <span class="card-index">Individual</span>
+        <h3>Counseling individual</h3>
+        <p>Sesiones de escucha y acompañamiento personalizado, presenciales u online, al ritmo que necesites.</p>
+      </article>
+      <article class="approach-card reveal">
+        <span class="card-index">Vínculos</span>
+        <h3>Counseling de pareja</h3>
+        <p>Un espacio neutral para reconstruir la comunicación y entender qué está pasando entre los dos.</p>
+      </article>
+      <article class="approach-card reveal">
+        <span class="card-index">Grupal</span>
+        <h3>Grupos de crecimiento</h3>
+        <p>Encuentros grupales guiados sobre ansiedad, duelo y autoestima, con otras personas que atraviesan procesos similares.</p>
+      </article>
+      <article class="approach-card reveal">
+        <span class="card-index">Talleres</span>
+        <h3>Talleres y ebooks</h3>
+        <p>Recursos descargables y talleres puntuales para trabajar en tu propio tiempo.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ EBOOKS ============ -->
+  <section class="section ebooks" id="ebooks" data-section="ebooks">
+    <span class="eyebrow reveal">03 — Recursos</span>
+    <h2 class="section-title reveal">Ebooks para tu proceso</h2>
+    <p class="section-lead reveal">
+      Materiales que preparé para acompañarte entre sesiones. Los que suba
+      desde el panel privado van a aparecer acá automáticamente.
+    </p>
+
+    <div class="ebook-grid" id="ebook-grid" data-dynamic="ebooks">
+      <!-- Se completa dinámicamente desde Supabase. Estado vacío por defecto: -->
+      <div class="ebook-empty" id="ebook-empty">
+        <p>Todavía no hay ebooks publicados.</p>
+        <span>Volvé pronto — voy a ir sumando material nuevo por acá.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIOS ============ -->
+  <section class="section testimonials" id="testimonios" data-section="testimonials">
+    <span class="eyebrow reveal">04 — Testimonios</span>
+    <div class="testimonial-track reveal">
+      <blockquote>
+        “Llegué sin saber muy bien qué buscaba y encontré un espacio real
+        de escucha, sin apuro y sin juicio.”
+        <cite>— Paciente en proceso individual</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ============ CONTACTO ============ -->
+  <section class="section contact" id="contacto" data-section="contact">
+    <div class="contact-grid">
+      <div>
+        <span class="eyebrow reveal">05 — Contacto</span>
+        <h2 class="section-title reveal">Demos el primer paso</h2>
+        <p class="section-lead reveal">
+          Escribime y coordinamos una primera charla sin compromiso para
+          ver cómo puedo acompañarte.
+        </p>
+        <a href="https://wa.me/5491156472298" target="_blank" rel="noopener" class="btn btn-primary reveal">
+          Escribir por WhatsApp
+        </a>
+      </div>
+      <form class="contact-form reveal" id="contact-form">
+        <label>
+          <span>Nombre</span>
+          <input type="text" name="nombre" required>
+        </label>
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" required>
+        </label>
+        <label>
+          <span>Contame brevemente qué te trae por acá</span>
+          <textarea name="mensaje" rows="4" required></textarea>
+        </label>
+        <button type="submit" class="btn btn-primary">Enviar mensaje</button>
+        <p class="form-note">Este formulario se conectará a Supabase en el próximo paso.</p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span>© <span id="year"></span> Mabel Mereles · Counselor</span>
+  <span>Buenos Aires, Argentina</span>
+</footer>
+
+<!-- ============ WHATSAPP FLOTANTE ============ -->
+<a href="https://wa.me/5491156472298" target="_blank" rel="noopener" class="whatsapp-float" aria-label="Escribir por WhatsApp">
+  <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+    <path fill="#fff" d="M16.01 3C9.38 3 4 8.38 4 15.01c0 2.35.68 4.53 1.86 6.38L4 29l7.8-1.82a12 12 0 0 0 4.21.76h.01c6.63 0 12.01-5.38 12.01-12.01C28.03 8.38 22.65 3 16.01 3z"/>
+    <path fill="#25D366" d="M16.01 4.5c-5.8 0-10.51 4.71-10.51 10.51 0 2.15.64 4.14 1.75 5.81l-1.17 5.2 5.34-1.25a10.44 10.44 0 0 0 4.59 1.05h.01c5.8 0 10.51-4.71 10.51-10.51S21.81 4.5 16.01 4.5z"/>
+    <path fill="#fff" d="M21.51 18.24c-.29-.15-1.7-.84-1.96-.93-.26-.1-.46-.15-.65.15-.19.29-.75.93-.92 1.12-.17.19-.34.22-.63.07-.29-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.19-.29.29-.48.1-.19.05-.36-.02-.51-.07-.15-.65-1.58-.9-2.16-.24-.57-.48-.49-.65-.5h-.56c-.19 0-.5.07-.77.36-.26.29-1 .98-1 2.4 0 1.41 1.03 2.78 1.17 2.97.15.19 2.02 3.09 4.9 4.33.68.3 1.22.47 1.63.6.68.22 1.31.19 1.8.11.55-.08 1.7-.7 1.94-1.37.24-.68.24-1.25.17-1.37-.07-.12-.26-.19-.55-.34z"/>
+  </svg>
+</a>
+
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
