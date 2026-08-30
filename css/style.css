@@ -468,6 +468,15 @@ textarea:focus-visible{
   border-bottom:1.5px solid var(--aqua-deep);
   padding-bottom:2px;
 }
+button.ebook-download{
+  background:none;
+  border:none;
+  border-bottom:1.5px solid var(--aqua-deep);
+  border-radius:0;
+  font-family:inherit;
+  cursor:pointer;
+}
+button.ebook-download:disabled{ opacity:.6; cursor:default; }
 
 /* ============ TESTIMONIOS ============ */
 .testimonial-grid{

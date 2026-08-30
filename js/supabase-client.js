@@ -1,83 +1,21 @@
 /* =========================================================
-   SUPABASE CLIENT — compartido entre index.html y login.html
+   SUPABASE CLIENT — compartido entre index.html, login.html y admin.html
    =========================================================
    1. Creá un proyecto en https://supabase.com
-   2. Reemplazá SUPABASE_URL y SUPABASE_ANON_KEY de abajo
+   2. Corré el script completo de /supabase/setup.sql en
+      Supabase → SQL Editor. Ese script crea las tablas, los
+      permisos (RLS) Y el bucket de Storage "ebooks" con sus
+      políticas — no hace falta crear nada a mano en Storage.
+   3. Reemplazá SUPABASE_URL y SUPABASE_ANON_KEY de abajo
       (Project Settings → API). La "anon key" es pública,
       la seguridad real la da Row Level Security (RLS).
-   3. Tablas sugeridas (se crean en el próximo paso junto
-      con login.html):
-
-      -- secciones de la web, para el drag & drop
-      create table public.sections (
-        id uuid primary key default gen_random_uuid(),
-        key text unique not null,        -- 'hero' | 'about' | 'approach' ...
-        title text,
-        content jsonb,                   -- textos/imágenes editables
-        position int not null default 0, -- orden -> drag & drop
-        visible boolean not null default true,
-        updated_at timestamptz default now()
-      );
-
-      -- ebooks descargables
-      create table public.ebooks (
-        id uuid primary key default gen_random_uuid(),
-        title text not null,
-        description text,
-        cover_url text,
-        cover_path text,                 -- ruta en Storage, para poder borrarla
-        file_url text not null,          -- Supabase Storage (bucket "ebooks")
-        file_path text not null,         -- ruta en Storage, para poder borrarla
-        price numeric default 0,         -- 0 = gratis, luego Mercado Pago
-        is_published boolean not null default true,
-        position int not null default 0,
-        created_at timestamptz default now()
-      );
-
-      -- mensajes del formulario de contacto
-      create table public.messages (
-        id uuid primary key default gen_random_uuid(),
-        nombre text not null,
-        email text not null,
-        mensaje text not null,
-        created_at timestamptz default now()
-      );
-
-   4. Storage: creá un bucket público llamado "ebooks" (Storage →
-      New bucket → Public bucket ON). Ahí se suben las portadas
-      (carpeta "covers/") y los archivos (carpeta "files/").
-
-   5. RLS sugerida (activar RLS en las 3 tablas y en el bucket):
-
-      -- sections: lectura pública, escritura solo autenticada
-      create policy "sections_public_read" on public.sections
-        for select using (true);
-      create policy "sections_auth_write" on public.sections
-        for all using (auth.role() = 'authenticated')
-        with check (auth.role() = 'authenticated');
-
-      -- ebooks: lectura pública solo de publicados, escritura autenticada
-      create policy "ebooks_public_read" on public.ebooks
-        for select using (is_published = true);
-      create policy "ebooks_auth_all" on public.ebooks
-        for all using (auth.role() = 'authenticated')
-        with check (auth.role() = 'authenticated');
-
-      -- messages: cualquiera puede insertar (el formulario), solo
-      -- Mabel (autenticada) puede leerlos
-      create policy "messages_public_insert" on public.messages
-        for insert with check (true);
-      create policy "messages_auth_read" on public.messages
-        for select using (auth.role() = 'authenticated');
-
-   6. El usuario de Mabel se crea a mano una sola vez desde
-      Supabase → Authentication → Add user (email + contraseña).
-      login.html no permite registrarse: es un panel privado de
-      un solo uso.
+   4. Creá el usuario de Mabel a mano, una sola vez, desde
+      Authentication → Users → Add user (email + contraseña).
+      login.html no permite registrarse: es un panel privado.
    ========================================================= */
 
-const SUPABASE_URL = "https://vvpvsclaextroldblltu.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cHZzY2xhZXh0cm9sZGJsbHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDY4MjUsImV4cCI6MjEwMzYyMjgyNX0.32kjThQX84W-O5X5OuNGtd986CUm7jnX8bdsW2J1h6k";
+const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
+const SUPABASE_ANON_KEY = "TU-ANON-KEY-PUBLICA";
 
 let supabaseClient = null;
 
@@ -129,12 +67,12 @@ async function fetchSectionsLayout() {
 }
 
 /** Guarda un mensaje del formulario de contacto. */
-async function sendContactMessage({ nombre, email, mensaje }) {
+async function sendContactMessage({ nombre, email, telefono, mensaje }) {
   if (!supabaseClient) {
     console.warn("Supabase no configurado: el mensaje no se envió.");
     return { ok: false, reason: "not-configured" };
   }
-  const { error } = await supabaseClient.from("messages").insert([{ nombre, email, mensaje }]);
+  const { error } = await supabaseClient.from("messages").insert([{ nombre, email, telefono, mensaje }]);
   if (error) return { ok: false, reason: error.message };
   return { ok: true };
 }

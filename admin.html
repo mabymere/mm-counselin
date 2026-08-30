@@ -92,10 +92,19 @@
             <input type="file" id="ebook-cover" accept="image/*">
           </label>
           <label>
-            <span>Archivo del ebook (PDF/EPUB)</span>
+            <span>Archivo del ebook (PDF/EPUB) — solo si es gratis</span>
             <input type="file" id="ebook-file" accept=".pdf,.epub">
           </label>
         </div>
+        <label>
+          <span>Link privado de Google Drive — solo si es pago</span>
+          <input type="url" id="ebook-drive-url" placeholder="https://drive.google.com/file/d/.../view">
+        </label>
+        <p class="field-hint" style="margin:-.4rem 0 0;">
+          Si le ponés precio (arriba), no hace falta subir el archivo: cuando alguien
+          paga por Mercado Pago le mostramos este link de Drive. Si es gratis (precio 0),
+          subí el archivo PDF/EPUB en su lugar.
+        </p>
         <label class="checkbox-row">
           <input type="checkbox" id="ebook-published" checked>
           <span>Publicado (visible en la web)</span>

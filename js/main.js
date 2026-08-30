@@ -192,6 +192,7 @@ revealEls.forEach(el => revealObserver.observe(el));
 
   emptyState.remove();
   ebooks.forEach((ebook) => {
+    const isPaid = ebook.price && ebook.price > 0;
     const card = document.createElement("article");
     card.className = "ebook-card reveal";
     card.innerHTML = `
@@ -201,15 +202,52 @@ revealEls.forEach(el => revealObserver.observe(el));
       <div class="ebook-body">
         <h3>${ebook.title}</h3>
         <p>${ebook.description || ""}</p>
-        <a class="ebook-download" href="${ebook.file_url}" target="_blank" rel="noopener">
-          ${ebook.price && ebook.price > 0 ? "Comprar" : "Descargar"}
-        </a>
+        ${
+          isPaid
+            ? `<button type="button" class="ebook-download ebook-buy-btn" data-ebook-id="${ebook.id}">Comprar${ebook.price ? ` · $${ebook.price}` : ""}</button>`
+            : `<a class="ebook-download" href="${ebook.file_url}" target="_blank" rel="noopener">Descargar</a>`
+        }
       </div>
     `;
     grid.appendChild(card);
     revealObserver.observe(card);
   });
+
+  grid.querySelectorAll(".ebook-buy-btn").forEach((btn) => {
+    btn.addEventListener("click", () => buyEbook(btn.dataset.ebookId, btn));
+  });
 })();
+
+/**
+ * Inicia el checkout de Mercado Pago para un ebook pago:
+ * crea la preferencia en el backend (Cloudflare Function) y
+ * redirige al checkout. La confirmación real llega después
+ * por webhook, no acá.
+ */
+async function buyEbook(ebookId, btn) {
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Redirigiendo a Mercado Pago...";
+
+  try {
+    const res = await fetch("/api/create-preference", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ebook_id: ebookId }),
+    });
+    const data = await res.json();
+
+    if (data.init_point) {
+      window.location.href = data.init_point;
+      return;
+    }
+    throw new Error(data.error || "Sin init_point");
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    alert("No se pudo iniciar el pago. Probá de nuevo en unos minutos.");
+  }
+}
 
 /* =========================================================
    FORMULARIO DE CONTACTO

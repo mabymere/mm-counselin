@@ -216,6 +216,7 @@ function openEbookForm(ebook) {
   document.getElementById("ebook-published").checked = ebook ? ebook.is_published !== false : true;
   document.getElementById("ebook-cover").value = "";
   document.getElementById("ebook-file").value = "";
+  document.getElementById("ebook-drive-url").value = ebook?.drive_url || "";
   document.getElementById("save-ebook-btn").textContent = ebook ? "Guardar cambios" : "Guardar ebook";
 
   form.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -236,13 +237,22 @@ async function submitEbookForm() {
   const is_published = document.getElementById("ebook-published").checked;
   const coverFile = document.getElementById("ebook-cover").files[0];
   const bookFile = document.getElementById("ebook-file").files[0];
+  const driveUrl = document.getElementById("ebook-drive-url").value.trim();
 
   if (!title) {
     showStatus(status, "Falta el título.", true);
     return;
   }
-  if (!id && !bookFile) {
-    showStatus(status, "Subí el archivo del ebook.", true);
+
+  const existing = id ? ebooksState.find((e) => e.id === id) : null;
+  const isPaid = price > 0;
+
+  if (isPaid && !driveUrl && !existing?.drive_url) {
+    showStatus(status, "Es un ebook pago: falta el link privado de Google Drive.", true);
+    return;
+  }
+  if (!isPaid && !bookFile && !existing?.file_url) {
+    showStatus(status, "Es un ebook gratis: falta subir el archivo PDF/EPUB.", true);
     return;
   }
 
@@ -250,6 +260,7 @@ async function submitEbookForm() {
   saveBtn.textContent = "Guardando...";
 
   const patch = { title, price, description, is_published };
+  if (driveUrl) patch.drive_url = driveUrl;
 
   if (coverFile) {
     const up = await uploadEbookFile(coverFile, "covers");
@@ -389,7 +400,7 @@ async function loadMessages() {
         <strong>${escapeHtml(m.nombre)}</strong>
         <span>${date}</span>
       </div>
-      <p><a href="mailto:${escapeAttr(m.email)}">${escapeHtml(m.email)}</a></p>
+      <p><a href="mailto:${escapeAttr(m.email)}">${escapeHtml(m.email)}</a>${m.telefono ? ` · <a href="https://wa.me/${escapeAttr(m.telefono.replace(/\D/g, ""))}" target="_blank" rel="noopener">${escapeHtml(m.telefono)}</a>` : ""}</p>
       <p>${escapeHtml(m.mensaje)}</p>
     `;
     list.appendChild(li);

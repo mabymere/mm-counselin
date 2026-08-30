@@ -1,0 +1,176 @@
+-- =========================================================
+-- MABEL MERELES · SETUP COMPLETO DE SUPABASE
+-- =========================================================
+-- Cómo correrlo:
+-- 1. Entrá a tu proyecto en https://supabase.com/dashboard
+-- 2. Menú izquierdo → "SQL Editor" → "New query"
+-- 3. Pegá TODO este archivo y tocá "Run" (o Ctrl/Cmd + Enter)
+-- 4. Con eso quedan creadas las tablas, los permisos (RLS) y
+--    el bucket de Storage "ebooks" con sus políticas.
+-- Se puede correr más de una vez sin romper nada (usa
+-- "if not exists" / "on conflict" / "drop policy if exists").
+-- =========================================================
+
+-- 0. Extensión necesaria para generar UUIDs
+create extension if not exists pgcrypto;
+
+-- =========================================================
+-- 1. TABLAS
+-- =========================================================
+
+create table if not exists public.sections (
+  id uuid primary key default gen_random_uuid(),
+  key text unique not null,          -- 'hero' | 'about' | 'approach' | 'ebooks' | 'testimonials' | 'contact'
+  title text,
+  content jsonb not null default '{}'::jsonb,   -- textos editables de esa sección
+  position int not null default 0,              -- orden -> drag & drop del panel
+  visible boolean not null default true,
+  updated_at timestamptz default now()
+);
+
+create table if not exists public.ebooks (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  cover_url text,
+  cover_path text,                   -- ruta en Storage (para poder borrarla)
+  file_url text,                     -- ebook gratuito: descarga directa
+  file_path text,                    -- ruta en Storage (para poder borrarla)
+  drive_url text,                    -- ebook pago: link privado de Google Drive,
+                                      -- solo se entrega después de un pago aprobado
+  price numeric not null default 0,  -- 0 = gratis, >0 = va por Mercado Pago
+  is_published boolean not null default true,
+  position int not null default 0,   -- orden -> drag & drop del panel
+  created_at timestamptz default now()
+);
+
+-- por si ya habías corrido este script antes de que existiera drive_url,
+-- o cuando file_url/file_path eran obligatorios
+alter table public.ebooks add column if not exists drive_url text;
+alter table public.ebooks alter column file_url drop not null;
+alter table public.ebooks alter column file_path drop not null;
+
+-- compras de ebooks pagos vía Mercado Pago. No tiene políticas de
+-- lectura/escritura pública a propósito: con RLS activado y sin
+-- policies, solo se puede acceder con la service_role key, que
+-- únicamente usan las Cloudflare Functions (nunca el navegador).
+create table if not exists public.purchases (
+  id uuid primary key default gen_random_uuid(),
+  ebook_id uuid references public.ebooks(id) on delete set null,
+  payer_email text,
+  amount numeric,
+  status text not null default 'pending',  -- pending | approved | rejected
+  mp_preference_id text,
+  mp_payment_id text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+alter table public.purchases enable row level security;
+
+create table if not exists public.messages (
+  id uuid primary key default gen_random_uuid(),
+  nombre text not null,
+  email text not null,
+  telefono text,
+  mensaje text not null,
+  created_at timestamptz default now()
+);
+
+-- por si ya habías corrido este script antes de que existiera la columna telefono
+alter table public.messages add column if not exists telefono text;
+
+-- =========================================================
+-- 2. SECCIONES INICIALES
+--    (orden por defecto con el que ya arranca la web;
+--    el panel las puede reordenar/ocultar después)
+-- =========================================================
+insert into public.sections (key, title, position, visible)
+values
+  ('hero',         'Portada',      0, true),
+  ('about',        'Sobre mí',     1, true),
+  ('approach',     'Enfoque',      2, true),
+  ('ebooks',       'Ebooks',       3, true),
+  ('testimonials', 'Testimonios',  4, true),
+  ('contact',      'Contacto',     5, true)
+on conflict (key) do nothing;
+
+-- =========================================================
+-- 3. ROW LEVEL SECURITY (RLS) — tablas
+-- =========================================================
+alter table public.sections enable row level security;
+alter table public.ebooks   enable row level security;
+alter table public.messages enable row level security;
+
+-- sections: cualquiera puede leer, solo Mabel (autenticada) puede escribir
+drop policy if exists "sections_public_read" on public.sections;
+create policy "sections_public_read" on public.sections
+  for select using (true);
+
+drop policy if exists "sections_auth_write" on public.sections;
+create policy "sections_auth_write" on public.sections
+  for all using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
+
+-- ebooks: lectura pública solo de los publicados; Mabel puede ver/editar todo
+drop policy if exists "ebooks_public_read" on public.ebooks;
+create policy "ebooks_public_read" on public.ebooks
+  for select using (is_published = true);
+
+drop policy if exists "ebooks_auth_all" on public.ebooks;
+create policy "ebooks_auth_all" on public.ebooks
+  for all using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
+
+-- messages: cualquiera puede enviar (el formulario), solo Mabel puede leerlos
+drop policy if exists "messages_public_insert" on public.messages;
+create policy "messages_public_insert" on public.messages
+  for insert with check (true);
+
+drop policy if exists "messages_auth_read" on public.messages;
+create policy "messages_auth_read" on public.messages
+  for select using (auth.role() = 'authenticated');
+
+-- =========================================================
+-- 4. STORAGE — bucket público "ebooks" + políticas
+--    (acá se reemplaza el paso manual de crear el bucket
+--    desde la interfaz: queda creado por este script)
+-- =========================================================
+insert into storage.buckets (id, name, public)
+values ('ebooks', 'ebooks', true)
+on conflict (id) do nothing;
+
+-- cualquiera puede DESCARGAR archivos del bucket (portadas y ebooks)
+drop policy if exists "ebooks_bucket_public_read" on storage.objects;
+create policy "ebooks_bucket_public_read"
+  on storage.objects for select
+  using (bucket_id = 'ebooks');
+
+-- solo Mabel (autenticada) puede SUBIR
+drop policy if exists "ebooks_bucket_auth_insert" on storage.objects;
+create policy "ebooks_bucket_auth_insert"
+  on storage.objects for insert
+  with check (bucket_id = 'ebooks' and auth.role() = 'authenticated');
+
+-- solo Mabel (autenticada) puede REEMPLAZAR
+drop policy if exists "ebooks_bucket_auth_update" on storage.objects;
+create policy "ebooks_bucket_auth_update"
+  on storage.objects for update
+  using (bucket_id = 'ebooks' and auth.role() = 'authenticated');
+
+-- solo Mabel (autenticada) puede BORRAR
+drop policy if exists "ebooks_bucket_auth_delete" on storage.objects;
+create policy "ebooks_bucket_auth_delete"
+  on storage.objects for delete
+  using (bucket_id = 'ebooks' and auth.role() = 'authenticated');
+
+-- =========================================================
+-- LISTO. Después de correr esto solo falta:
+--   a) Copiar Project URL + anon key (Project Settings → API)
+--      y pegarlas en js/supabase-client.js
+--   b) Copiar también el "service_role key" (Project Settings → API,
+--      es SECRETA) y cargarla como variable de entorno en Cloudflare
+--      Pages junto con el Access Token de Mercado Pago. Ver la guía
+--      de /functions/README.md para el detalle de Mercado Pago.
+--   c) Crear el usuario de Mabel a mano en
+--      Authentication → Users → Add user (email + contraseña)
+-- =========================================================

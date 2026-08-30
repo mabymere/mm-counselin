@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tu compra · Mabel Mereles</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<style>
+  body{ display:flex; align-items:center; justify-content:center; min-height:100svh; padding:1.25rem; }
+  .result-card{
+    width:100%; max-width:440px;
+    background:var(--paper);
+    border:1px solid var(--bone-deep);
+    border-radius:20px;
+    padding:2.4rem 2rem;
+    text-align:center;
+    box-shadow:0 30px 60px -30px rgba(43,46,34,.35);
+  }
+  .result-icon{
+    width:56px; height:56px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 1.1rem;
+    background:var(--aqua-soft);
+    color:var(--aqua-deep);
+    font-size:1.6rem;
+  }
+  .result-card h1{
+    font-family:var(--font-display);
+    font-weight:500;
+    font-size:1.5rem;
+    color:var(--olive-deep);
+    margin:0 0 .6rem;
+  }
+  .result-card p{ font-size:.92rem; color:var(--ink-soft); margin:0 0 1.5rem; line-height:1.55; }
+  .result-card .btn{ width:100%; }
+  .result-card a.secondary{
+    display:block; margin-top:1rem; font-size:.85rem; font-weight:700; color:var(--aqua-deep);
+  }
+  .spin{
+    width:26px; height:26px;
+    border:3px solid var(--aqua-soft);
+    border-top-color:var(--aqua-deep);
+    border-radius:50%;
+    margin:0 auto 1.1rem;
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="result-card" id="result-card">
+  <div class="spin"></div>
+  <h1>Confirmando tu pago…</h1>
+  <p>Esto puede tardar unos segundos. No cierres esta página.</p>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get("external_reference");
+  const card = document.getElementById("result-card");
+
+  function render(state) {
+    if (state === "approved") return;
+    // los otros estados se renderizan directo en checkStatus()
+  }
+
+  function renderApproved(data) {
+    card.innerHTML = `
+      <div class="result-icon">✓</div>
+      <h1>¡Gracias por tu compra!</h1>
+      <p>Ya podés descargar <strong>${data.title || "tu ebook"}</strong>. El link es privado, guardalo para vos.</p>
+      <a class="btn btn-primary" href="${data.drive_url}" target="_blank" rel="noopener">Descargar ebook</a>
+      <a class="secondary" href="index.html#ebooks">Volver a la web</a>
+    `;
+  }
+
+  function renderPending() {
+    card.innerHTML = `
+      <div class="result-icon">⏳</div>
+      <h1>Tu pago está en proceso</h1>
+      <p>Mercado Pago todavía lo está confirmando. Apenas se acredite vas a poder descargar tu ebook — si tarda, escribinos por WhatsApp con tu comprobante.</p>
+      <a class="btn btn-ghost" href="index.html">Volver a la web</a>
+    `;
+  }
+
+  function renderRejected() {
+    card.innerHTML = `
+      <div class="result-icon">✕</div>
+      <h1>El pago no se pudo completar</h1>
+      <p>No te preocupes, no se generó ningún cobro. Podés intentar de nuevo desde la web.</p>
+      <a class="btn btn-primary" href="index.html#ebooks">Volver a intentar</a>
+    `;
+  }
+
+  function renderError() {
+    card.innerHTML = `
+      <div class="result-icon">!</div>
+      <h1>No pudimos verificar tu pago</h1>
+      <p>Si te llegó la confirmación de Mercado Pago, escribinos por WhatsApp con el comprobante y te mandamos el ebook a mano.</p>
+      <a class="btn btn-primary" href="https://wa.me/5491156472298" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+    `;
+  }
+
+  let attempts = 0;
+  async function checkStatus() {
+    if (!ref) return renderError();
+    attempts++;
+    try {
+      const res = await fetch(`/api/purchase-status?ref=${encodeURIComponent(ref)}`);
+      const data = await res.json();
+
+      if (data.status === "approved") return renderApproved(data);
+      if (data.status === "rejected" || data.status === "cancelled") return renderRejected();
+
+      // pending / in_process / not_found: reintentamos unas cuantas veces
+      // por si el webhook todavía no llegó
+      if (attempts < 8) {
+        setTimeout(checkStatus, 2500);
+      } else {
+        renderPending();
+      }
+    } catch (err) {
+      renderError();
+    }
+  }
+
+  checkStatus();
+</script>
+</body>
+</html>
