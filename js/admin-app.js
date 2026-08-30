@@ -229,6 +229,7 @@ function openEbookForm(ebook) {
   document.getElementById("ebook-price").value = ebook?.price || 0;
   document.getElementById("ebook-description").value = ebook?.description || "";
   document.getElementById("ebook-long-description").value = ebook?.long_description || "";
+  document.getElementById("ebook-keywords").value = ebook?.keywords || "";
   document.getElementById("ebook-published").checked = ebook ? ebook.is_published !== false : true;
   document.getElementById("ebook-show-downloads").checked = ebook ? !!ebook.show_downloads : false;
   document.getElementById("ebook-cover").value = "";
@@ -270,6 +271,7 @@ async function submitEbookForm() {
   const price = parseFloat(document.getElementById("ebook-price").value) || 0;
   const description = document.getElementById("ebook-description").value.trim();
   const long_description = document.getElementById("ebook-long-description").value.trim();
+  const keywords = document.getElementById("ebook-keywords").value.trim();
   const is_published = document.getElementById("ebook-published").checked;
   const show_downloads = document.getElementById("ebook-show-downloads").checked;
   const coverFile = document.getElementById("ebook-cover").files[0];
@@ -296,7 +298,7 @@ async function submitEbookForm() {
   saveBtn.disabled = true;
   saveBtn.textContent = "Guardando...";
 
-  const patch = { title, price, description, long_description, is_published, show_downloads };
+  const patch = { title, price, description, long_description, keywords, is_published, show_downloads };
   if (driveUrl) patch.drive_url = driveUrl;
   if (!existing?.slug) patch.slug = slugify(title);
 

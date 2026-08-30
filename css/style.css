@@ -871,6 +871,65 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   color:var(--aqua-deep);
   margin-bottom:1.2rem;
 }
+
+/* ---------- botón de compartir ---------- */
+.ebook-share{
+  position:relative;
+  display:flex;
+  justify-content:center;
+  margin-bottom:1.4rem;
+}
+.ebook-share-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  padding:.45rem 1rem;
+  border-radius:100px;
+  border:1.5px solid var(--olive-deep);
+  background:transparent;
+  color:var(--olive-deep);
+  font-family:inherit;
+  font-size:.8rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .25s, color .25s;
+}
+.ebook-share-btn:hover{ background:var(--olive-deep); color:var(--bone); }
+.ebook-share-menu{
+  position:absolute;
+  top:calc(100% + .5rem);
+  left:50%;
+  transform:translateX(-50%);
+  width:200px;
+  background:var(--paper);
+  border:1px solid var(--bone-deep);
+  border-radius:14px;
+  padding:.5rem;
+  box-shadow:0 20px 40px -18px rgba(43,46,34,.4);
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  gap:.15rem;
+}
+.ebook-share-option{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  padding:.55rem .7rem;
+  border-radius:9px;
+  border:none;
+  background:none;
+  font-family:inherit;
+  font-size:.83rem;
+  font-weight:600;
+  color:var(--ink);
+  cursor:pointer;
+  text-align:left;
+  transition:background .2s, color .2s;
+}
+.ebook-share-option:hover{ background:var(--aqua-soft); color:var(--aqua-deep); }
+.ebook-share-option svg{ flex:none; color:var(--aqua-deep); }
+
 .ebook-detail-summary{
   color:var(--ink-soft);
   font-size:1rem;
@@ -919,6 +978,8 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   .ebook-detail-price,
   .ebook-detail-summary{ text-align:left; margin-left:0; margin-right:0; }
   .ebook-detail-actions{ align-items:flex-start; margin:0; }
+  .ebook-share{ justify-content:flex-start; }
+  .ebook-share-menu{ left:0; transform:none; }
 }
 
 /* ============ WHATSAPP FLOTANTE ============ */

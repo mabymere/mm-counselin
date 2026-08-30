@@ -91,6 +91,7 @@ export async function onRequestGet({ params, env, request }) {
 
 <title>${title} | Mabel Mereles</title>
 <meta name="description" content="${shortDesc || title}">
+${ebook.keywords ? `<meta name="keywords" content="${escapeHtml(ebook.keywords)}">` : ""}
 <link rel="canonical" href="${pageUrl}">
 <meta name="robots" content="index, follow">
 
@@ -119,6 +120,7 @@ ${coverUrl ? `<meta name="twitter:image" content="${coverUrl}">` : ""}
   "@type": "Book",
   "name": ${JSON.stringify(ebook.title)},
   "description": ${JSON.stringify(ebook.description || "")},
+  ${ebook.keywords ? `"keywords": ${JSON.stringify(ebook.keywords)},` : ""}
   ${coverUrl ? `"image": ${JSON.stringify(coverUrl)},` : ""}
   "url": ${JSON.stringify(pageUrl)},
   "author": { "@type": "Person", "name": "Mabel Mereles" },
@@ -176,6 +178,39 @@ ${coverUrl ? `<meta name="twitter:image" content="${coverUrl}">` : ""}
     <div class="ebook-detail-info">
       <h1>${title}</h1>
       ${isPaid ? `<span class="ebook-detail-price">$${ebook.price}</span>` : `<span class="ebook-detail-price">Gratis</span>`}
+
+      <div class="ebook-share">
+        <button type="button" class="ebook-share-btn" id="ebook-share-btn">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/>
+            <path d="M16 6l-4-4-4 4"/>
+            <path d="M12 2v14"/>
+          </svg>
+          Compartir
+        </button>
+        <div class="ebook-share-menu" id="ebook-share-menu" hidden>
+          <a class="ebook-share-option" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(ebook.title + " — " + pageUrl)}">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Z"/><path d="M8.5 9.5c.3 2.7 2.3 4.7 5 5"/></svg>
+            WhatsApp
+          </a>
+          <a class="ebook-share-option" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14 8.5h-1.3c-.9 0-1.2.4-1.2 1.2V11h2.4l-.3 2.5h-2.1V19h-2.6v-5.5H7v-2.5h1.9V9.3C8.9 7.4 9.9 6 12 6h2v2.5Z"/></svg>
+            Facebook
+          </a>
+          <a class="ebook-share-option" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(ebook.title)}">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
+            X
+          </a>
+          <a class="ebook-share-option" href="fb-messenger://share/?link=${encodeURIComponent(pageUrl)}">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0-9 8.4c0 2.6 1.3 4.9 3.4 6.4V21l3.1-1.7c.8.2 1.6.3 2.5.3a9 9 0 0 0 0-16.6Z"/><path d="M7.5 13l3-3.4 2 2 3-3.4"/></svg>
+            Messenger
+          </a>
+          <button type="button" class="ebook-share-option" id="ebook-share-copy">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l2-2a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-2 2a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+            <span id="ebook-share-copy-label">Copiar link</span>
+          </button>
+        </div>
+      </div>
 
       <div class="ebook-detail-summary">${summaryHtml}</div>
 
@@ -271,6 +306,37 @@ ${coverUrl ? `<meta name="twitter:image" content="${coverUrl}">` : ""}
     const cover = document.querySelector(".ebook-detail-cover[data-cover]");
     if (cover) {
       cover.addEventListener("click", () => openEbookLightbox(cover.dataset.cover, cover.dataset.title));
+    }
+
+    // botón de compartir
+    const shareBtn = document.getElementById("ebook-share-btn");
+    const shareMenu = document.getElementById("ebook-share-menu");
+    if (shareBtn && shareMenu) {
+      shareBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        shareMenu.hidden = !shareMenu.hidden;
+      });
+      document.addEventListener("click", (e) => {
+        if (!shareMenu.hidden && !shareMenu.contains(e.target) && e.target !== shareBtn) {
+          shareMenu.hidden = true;
+        }
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") shareMenu.hidden = true;
+      });
+    }
+    const copyBtn = document.getElementById("ebook-share-copy");
+    if (copyBtn) {
+      copyBtn.addEventListener("click", async () => {
+        const label = document.getElementById("ebook-share-copy-label");
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          label.textContent = "¡Copiado!";
+        } catch (err) {
+          label.textContent = "No se pudo copiar";
+        }
+        setTimeout(() => (label.textContent = "Copiar link"), 2000);
+      });
     }
   });
 </script>

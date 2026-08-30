@@ -51,6 +51,7 @@ alter table public.ebooks add column if not exists downloads_count int not null 
 alter table public.ebooks add column if not exists show_downloads boolean not null default false;
 alter table public.ebooks add column if not exists long_description text; -- resumen extendido, para la página propia del ebook
 alter table public.ebooks add column if not exists slug text unique;      -- ej: "como_poner_limites_sin_culpa" -> merelesmabel.com/como_poner_limites_sin_culpa
+alter table public.ebooks add column if not exists keywords text;         -- palabras clave SEO, separadas por coma
 
 -- para poder sacarle los acentos al generar el slug de los ebooks
 -- que ya existían antes de agregar esta columna
