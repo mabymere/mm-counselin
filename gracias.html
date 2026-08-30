@@ -64,6 +64,7 @@
 <script>
   const params = new URLSearchParams(window.location.search);
   const ref = params.get("external_reference");
+  const paymentId = params.get("payment_id") || params.get("collection_id");
   const card = document.getElementById("result-card");
 
   function render(state) {
@@ -87,6 +88,15 @@
       <h1>Tu pago está en proceso</h1>
       <p>Mercado Pago todavía lo está confirmando. Apenas se acredite vas a poder descargar tu ebook — si tarda, escribinos por WhatsApp con tu comprobante.</p>
       <a class="btn btn-ghost" href="index.html">Volver a la web</a>
+    `;
+  }
+
+  function renderAbandoned() {
+    card.innerHTML = `
+      <div class="result-icon">↩</div>
+      <h1>Volviste sin completar el pago</h1>
+      <p>No se generó ningún cobro. Cuando quieras, retomá la compra desde la web — el ebook te va a estar esperando.</p>
+      <a class="btn btn-primary" href="index.html#ebooks">Volver a los ebooks</a>
     `;
   }
 
@@ -119,8 +129,16 @@
       if (data.status === "approved") return renderApproved(data);
       if (data.status === "rejected" || data.status === "cancelled") return renderRejected();
 
-      // pending / in_process / not_found: reintentamos unas cuantas veces
-      // por si el webhook todavía no llegó
+      // Sigue "pending" en nuestra base. Si Mercado Pago nunca mandó un
+      // payment_id, es que la persona volvió ANTES de intentar pagar
+      // (ej. tocó "Volver a la tienda"): se lo decimos directo, sin
+      // hacerla esperar el ciclo de reintentos ni sonar a que hay un
+      // cobro pendiente.
+      if (!paymentId) return renderAbandoned();
+
+      // Sí hubo un intento de pago real: puede que el webhook todavía
+      // no llegó, reintentamos unas cuantas veces antes de avisar que
+      // sigue en proceso.
       if (attempts < 8) {
         setTimeout(checkStatus, 2500);
       } else {

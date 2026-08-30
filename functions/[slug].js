@@ -190,6 +190,12 @@ ${coverUrl ? `<meta name="twitter:image" content="${coverUrl}">` : ""}
                <button type="button" class="ebook-coupon-toggle">¿Tenés un cupón?</button>
                <div class="ebook-coupon-box" hidden>
                  <input type="text" class="ebook-coupon-input" placeholder="Código de cupón">
+               </div>
+               <button type="button" class="ebook-recover-toggle">¿Ya pagaste y no pudiste descargar?</button>
+               <div class="ebook-recover-box" hidden>
+                 <input type="email" class="ebook-recover-email" placeholder="Tu email de compra">
+                 <button type="button" class="ebook-recover-submit" data-ebook-id="${ebook.id}">Buscar mi compra</button>
+                 <p class="ebook-recover-status" hidden></p>
                </div>`
             : `<button type="button" class="ebook-download ebook-free-btn" data-ebook-id="${ebook.id}" data-file-url="${ebook.file_url || ""}">Descargar</button>`
         }
@@ -238,6 +244,21 @@ ${coverUrl ? `<meta name="twitter:image" content="${coverUrl}">` : ""}
         const box = document.querySelector(".ebook-coupon-box");
         box.hidden = !box.hidden;
         if (!box.hidden) box.querySelector("input").focus();
+      });
+    }
+    const recoverToggle = document.querySelector(".ebook-recover-toggle");
+    if (recoverToggle) {
+      recoverToggle.addEventListener("click", () => {
+        const box = document.querySelector(".ebook-recover-box");
+        box.hidden = !box.hidden;
+        if (!box.hidden) box.querySelector("input").focus();
+      });
+    }
+    const recoverBtn = document.querySelector(".ebook-recover-submit");
+    if (recoverBtn) {
+      recoverBtn.addEventListener("click", () => {
+        const box = recoverBtn.closest(".ebook-recover-box");
+        recoverPurchase(recoverBtn.dataset.ebookId, box.querySelector(".ebook-recover-email"), box.querySelector(".ebook-recover-status"), recoverBtn);
       });
     }
     const freeBtn = document.querySelector(".ebook-free-btn");

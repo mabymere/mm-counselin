@@ -213,6 +213,12 @@ revealEls.forEach(el => revealObserver.observe(el));
                  <button type="button" class="ebook-coupon-toggle">¿Tenés un cupón?</button>
                  <div class="ebook-coupon-box" hidden>
                    <input type="text" class="ebook-coupon-input" placeholder="Código de cupón">
+                 </div>
+                 <button type="button" class="ebook-recover-toggle">¿Ya pagaste y no pudiste descargar?</button>
+                 <div class="ebook-recover-box" hidden>
+                   <input type="email" class="ebook-recover-email" placeholder="Tu email de compra">
+                   <button type="button" class="ebook-recover-submit" data-ebook-id="${ebook.id}">Buscar mi compra</button>
+                   <p class="ebook-recover-status" hidden></p>
                  </div>`
               : `<button type="button" class="ebook-download ebook-free-btn" data-ebook-id="${ebook.id}" data-file-url="${ebook.file_url}">Descargar</button>`
           }
@@ -237,6 +243,21 @@ revealEls.forEach(el => revealObserver.observe(el));
       const box = toggle.nextElementSibling;
       box.hidden = !box.hidden;
       if (!box.hidden) box.querySelector("input").focus();
+    });
+  });
+
+  grid.querySelectorAll(".ebook-recover-toggle").forEach((toggle) => {
+    toggle.addEventListener("click", () => {
+      const box = toggle.nextElementSibling;
+      box.hidden = !box.hidden;
+      if (!box.hidden) box.querySelector("input").focus();
+    });
+  });
+
+  grid.querySelectorAll(".ebook-recover-submit").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const box = btn.closest(".ebook-recover-box");
+      recoverPurchase(btn.dataset.ebookId, box.querySelector(".ebook-recover-email"), box.querySelector(".ebook-recover-status"), btn);
     });
   });
 
@@ -277,6 +298,51 @@ if (ebookLightbox) {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !ebookLightbox.hidden) closeEbookLightbox();
   });
+}
+
+/**
+ * Busca una compra ya aprobada con ese email para ese ebook (para
+ * cuando alguien pagó de verdad pero perdió la página de gracias.html).
+ * Si la encuentra, redirige a gracias.html reusando toda esa lógica.
+ */
+async function recoverPurchase(ebookId, emailInput, statusEl, btn) {
+  const email = emailInput.value.trim();
+  if (!email) {
+    statusEl.hidden = false;
+    statusEl.textContent = "Escribí el email que usaste para pagar.";
+    return;
+  }
+
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Buscando...";
+  statusEl.hidden = true;
+
+  try {
+    const res = await fetch("/api/recover-purchase", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ebook_id: ebookId, email }),
+    });
+    const data = await res.json();
+
+    if (data.found) {
+      window.location.href = `gracias.html?external_reference=${encodeURIComponent(data.external_reference)}`;
+      return;
+    }
+
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    statusEl.hidden = false;
+    statusEl.innerHTML =
+      'No encontramos ninguna compra aprobada con ese email para este ebook. Si ya pagaste, ' +
+      '<a href="https://wa.me/5491156472298" target="_blank" rel="noopener">escribinos por WhatsApp</a> con tu comprobante y te lo mandamos a mano.';
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    statusEl.hidden = false;
+    statusEl.textContent = "No se pudo buscar tu compra. Probá de nuevo en unos minutos.";
+  }
 }
 
 /**

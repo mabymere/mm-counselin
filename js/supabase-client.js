@@ -1,6 +1,10 @@
 /* =========================================================
    SUPABASE CLIENT — compartido entre index.html, login.html y admin.html
    =========================================================
+   Las credenciales del proyecto de Mabel (URL + anon key) ya están
+   cargadas abajo. Si en algún momento se crea un proyecto de
+   Supabase nuevo (por ejemplo, para un entorno de pruebas aparte),
+   los pasos son:
    1. Creá un proyecto en https://supabase.com
    2. Corré el script completo de /supabase/setup.sql en
       Supabase → SQL Editor. Ese script crea las tablas, los
@@ -15,7 +19,8 @@
    ========================================================= */
 
 const SUPABASE_URL = "https://vvpvsclaextroldblltu.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cHZzY2xhZXh0cm9sZGJsbHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDY4MjUsImV4cCI6MjEwMzYyMjgyNX0.32kjThQX84W-O5X5OuNGtd986CUm7jnX8bdsW2J1h6k";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cHZzY2xhZXh0cm9sZGJsbHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDY4MjUsImV4cCI6MjEwMzYyMjgyNX0.32kjThQX84W-O5X5OuNGtd986CUm7jnX8bdsW2J1h6k";
 
 let supabaseClient = null;
 
