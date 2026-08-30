@@ -76,8 +76,8 @@
       un solo uso.
    ========================================================= */
 
-const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
-const SUPABASE_ANON_KEY = "TU-ANON-KEY-PUBLICA";
+const SUPABASE_URL = "https://vvpvsclaextroldblltu.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cHZzY2xhZXh0cm9sZGJsbHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDY4MjUsImV4cCI6MjEwMzYyMjgyNX0.32kjThQX84W-O5X5OuNGtd986CUm7jnX8bdsW2J1h6k";
 
 let supabaseClient = null;
 
