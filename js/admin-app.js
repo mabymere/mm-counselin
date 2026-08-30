@@ -400,7 +400,14 @@ async function loadMessages() {
         <strong>${escapeHtml(m.nombre)}</strong>
         <span>${date}</span>
       </div>
-      <p><a href="mailto:${escapeAttr(m.email)}">${escapeHtml(m.email)}</a>${m.telefono ? ` · <a href="https://wa.me/${escapeAttr(m.telefono.replace(/\D/g, ""))}" target="_blank" rel="noopener">${escapeHtml(m.telefono)}</a>` : ""}</p>
+      <div class="message-item-contact">
+        <span><b>Email:</b> <a href="mailto:${escapeAttr(m.email)}">${escapeHtml(m.email)}</a></span>
+        <span><b>Teléfono:</b> ${
+          m.telefono
+            ? `<a href="https://wa.me/${escapeAttr(m.telefono.replace(/\D/g, ""))}" target="_blank" rel="noopener">${escapeHtml(m.telefono)}</a>`
+            : "—"
+        }</span>
+      </div>
       <p>${escapeHtml(m.mensaje)}</p>
     `;
     list.appendChild(li);

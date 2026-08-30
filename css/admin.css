@@ -72,6 +72,25 @@
   color:var(--ink);
 }
 .login-form input:focus{ outline:none; border-color:var(--aqua-deep); }
+.password-field{
+  position:relative;
+  display:flex;
+}
+.password-field input{ width:100%; padding-right:2.6rem; }
+.password-toggle{
+  position:absolute;
+  top:50%; right:.6rem;
+  transform:translateY(-50%);
+  background:none;
+  border:none;
+  padding:.3rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--ink-soft);
+  cursor:pointer;
+}
+.password-toggle:hover{ color:var(--aqua-deep); }
 .login-form .btn{ width:100%; margin-top:.3rem; }
 .login-error{
   margin:0;
@@ -411,6 +430,16 @@
 }
 .message-item-head strong{ font-size:.92rem; color:var(--ink); }
 .message-item-head span{ font-size:.74rem; color:var(--ink-soft); }
+.message-item-contact{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.3rem 1.1rem;
+  margin-bottom:.5rem;
+  font-size:.82rem;
+  color:var(--ink-soft);
+}
+.message-item-contact b{ color:var(--ink); font-weight:700; }
+.message-item-contact a{ color:var(--aqua-deep); font-weight:600; }
 .message-item p{ margin:0; font-size:.88rem; color:var(--ink-soft); line-height:1.5; }
 .message-item a{ color:var(--aqua-deep); font-weight:700; }
 
