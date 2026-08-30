@@ -197,7 +197,7 @@ revealEls.forEach(el => revealObserver.observe(el));
     card.className = "ebook-card reveal";
     card.innerHTML = `
       <div class="ebook-cover">
-        ${ebook.cover_url ? `<img src="${ebook.cover_url}" alt="${ebook.title}">` : ""}
+        ${ebook.cover_url ? `<img src="${ebook.cover_url}" alt="${ebook.title}" loading="lazy">` : ""}
       </div>
       <div class="ebook-body">
         <h3>${ebook.title}</h3>

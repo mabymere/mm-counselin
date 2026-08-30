@@ -115,7 +115,8 @@ values
   ('approach',     'Enfoque',      2, true),
   ('ebooks',       'Ebooks',       3, true),
   ('testimonials', 'Testimonios',  4, true),
-  ('contact',      'Contacto',     5, true)
+  ('faq',          'Preguntas frecuentes', 5, true),
+  ('contact',      'Contacto',     6, true)
 on conflict (key) do nothing;
 
 -- =========================================================

@@ -14,8 +14,8 @@
       login.html no permite registrarse: es un panel privado.
    ========================================================= */
 
-const SUPABASE_URL = "https://vvpvsclaextroldblltu.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cHZzY2xhZXh0cm9sZGJsbHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDY4MjUsImV4cCI6MjEwMzYyMjgyNX0.32kjThQX84W-O5X5OuNGtd986CUm7jnX8bdsW2J1h6k";
+const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
+const SUPABASE_ANON_KEY = "TU-ANON-KEY-PUBLICA";
 
 let supabaseClient = null;
 
@@ -126,7 +126,8 @@ const DEFAULT_SECTIONS = [
   { key: "approach", title: "Enfoque", position: 2, visible: true, content: {} },
   { key: "ebooks", title: "Ebooks", position: 3, visible: true, content: {} },
   { key: "testimonials", title: "Testimonios", position: 4, visible: true, content: {} },
-  { key: "contact", title: "Contacto", position: 5, visible: true, content: {} },
+  { key: "faq", title: "Preguntas frecuentes", position: 5, visible: true, content: {} },
+  { key: "contact", title: "Contacto", position: 6, visible: true, content: {} },
 ];
 
 /** Trae TODAS las secciones para el panel admin (visibles u ocultas). */

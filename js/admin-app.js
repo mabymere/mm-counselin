@@ -19,6 +19,7 @@ const SECTION_FIELD_DEFS = {
   approach: [{ key: "title", label: "Título de la sección", type: "text", placeholder: "Cómo trabajamos juntos" }],
   ebooks: [{ key: "title", label: "Título de la sección", type: "text", placeholder: "Ebooks para tu proceso" }],
   testimonials: [{ key: "title", label: "Título de la sección", type: "text", placeholder: "Lo que cuentan quienes pasaron por acá" }],
+  faq: [{ key: "title", label: "Título de la sección", type: "text", placeholder: "Sobre el counseling" }],
   contact: [
     { key: "title", label: "Título de la sección", type: "text", placeholder: "Demos el primer paso" },
     { key: "lead", label: "Bajada", type: "textarea", placeholder: "Escribime y coordinamos una primera charla sin compromiso..." },

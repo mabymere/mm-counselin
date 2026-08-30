@@ -530,6 +530,49 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; }
   color:var(--aqua-deep);
 }
 
+/* ============ PREGUNTAS FRECUENTES ============ */
+.faq-list{
+  display:flex;
+  flex-direction:column;
+  gap:.7rem;
+  margin-top:2rem;
+}
+.faq-item{
+  background:var(--paper);
+  border:1px solid var(--bone-deep);
+  border-radius:14px;
+  padding:1.1rem 1.3rem;
+}
+.faq-item summary{
+  cursor:pointer;
+  list-style:none;
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:1.02rem;
+  color:var(--olive-deep);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+}
+.faq-item summary::-webkit-details-marker{ display:none; }
+.faq-item summary::after{
+  content:"+";
+  flex:none;
+  font-family:var(--font-body);
+  font-size:1.3rem;
+  font-weight:400;
+  color:var(--aqua-deep);
+  transition:transform .3s var(--ease);
+}
+.faq-item[open] summary::after{ transform:rotate(45deg); }
+.faq-item p{
+  margin:.9rem 0 0;
+  font-size:.92rem;
+  color:var(--ink-soft);
+  line-height:1.6;
+}
+
 /* ============ CONTACTO ============ */
 .contact-grid{
   display:flex;
