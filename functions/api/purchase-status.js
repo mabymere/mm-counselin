@@ -20,7 +20,13 @@ export async function onRequestGet({ request, env }) {
     if (!purchase) return json({ status: "not_found" }, 404);
 
     if (purchase.status !== "approved") {
-      return json({ status: purchase.status });
+      return json({
+        status: purchase.status,
+        // true solo si el webhook de Mercado Pago llegó a registrar un
+        // pago real para esta compra. Si nunca llegó, es que la persona
+        // no completó el pago (haya "vuelto a la tienda" o lo que sea).
+        has_payment: !!purchase.mp_payment_id,
+      });
     }
 
     const ebooks = await sbSelect(env, "ebooks", `id=eq.${purchase.ebook_id}&select=title,drive_url,cover_url`);
