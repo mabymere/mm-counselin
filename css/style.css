@@ -476,7 +476,21 @@ button.ebook-download{
   font-family:inherit;
   cursor:pointer;
 }
+.ebook-actions-row{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  flex-wrap:wrap;
+}
 button.ebook-download:disabled{ opacity:.6; cursor:default; }
+.ebook-downloads-badge{
+  font-size:.72rem;
+  font-weight:700;
+  color:var(--ink-soft);
+  background:var(--aqua-soft);
+  padding:.2rem .55rem;
+  border-radius:100px;
+}
 
 /* ============ TESTIMONIOS ============ */
 .testimonial-grid{

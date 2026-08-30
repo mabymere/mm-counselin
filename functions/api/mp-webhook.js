@@ -6,7 +6,7 @@
    confiar en los parámetros que vuelven por la URL al navegador.
    ========================================================= */
 
-import { sbUpdate, json } from "../_lib/supabase.js";
+import { sbSelect, sbUpdate, sbRpc, json } from "../_lib/supabase.js";
 
 export async function onRequestPost({ request, env }) {
   try {
@@ -37,12 +37,23 @@ export async function onRequestPost({ request, env }) {
     const purchaseId = payment.external_reference;
     if (!purchaseId) return json({ ok: true, ignored: true });
 
+    const existing = await sbSelect(env, "purchases", `id=eq.${purchaseId}&select=status,ebook_id`);
+    const previousStatus = existing[0]?.status;
+    const ebookId = existing[0]?.ebook_id;
+
     await sbUpdate(env, "purchases", `id=eq.${purchaseId}`, {
       status: payment.status, // approved | rejected | pending | in_process | ...
       mp_payment_id: String(payment.id),
       payer_email: payment.payer?.email || undefined,
       updated_at: new Date().toISOString(),
     });
+
+    // sumamos a "descargas" del ebook solo la primera vez que este pago
+    // queda aprobado (evita duplicar el conteo si Mercado Pago reintenta
+    // el webhook, algo que hace normalmente).
+    if (payment.status === "approved" && previousStatus !== "approved" && ebookId) {
+      await sbRpc(env, "increment_ebook_downloads", { ebook_id: ebookId });
+    }
 
     // Mercado Pago solo necesita un 200 rápido, sin importar el contenido.
     return json({ ok: true });

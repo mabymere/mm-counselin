@@ -361,10 +361,10 @@
 .ebook-form textarea{ resize:vertical; }
 .checkbox-row{
   flex-direction:row !important;
-  align-items:center;
+  align-items:flex-start;
   gap:.55rem !important;
 }
-.checkbox-row input{ width:18px; height:18px; }
+.checkbox-row input{ width:18px; height:18px; flex:none; margin-top:.15rem; }
 .form-actions{ display:flex; justify-content:flex-end; gap:.7rem; }
 
 .ebook-list{

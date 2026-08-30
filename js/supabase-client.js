@@ -14,8 +14,8 @@
       login.html no permite registrarse: es un panel privado.
    ========================================================= */
 
-const SUPABASE_URL = "https://vvpvsclaextroldblltu.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cHZzY2xhZXh0cm9sZGJsbHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDY4MjUsImV4cCI6MjEwMzYyMjgyNX0.32kjThQX84W-O5X5OuNGtd986CUm7jnX8bdsW2J1h6k";
+const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
+const SUPABASE_ANON_KEY = "TU-ANON-KEY-PUBLICA";
 
 let supabaseClient = null;
 
@@ -75,6 +75,20 @@ async function sendContactMessage({ nombre, email, telefono, mensaje }) {
   const { error } = await supabaseClient.from("messages").insert([{ nombre, email, telefono, mensaje }]);
   if (error) return { ok: false, reason: error.message };
   return { ok: true };
+}
+
+/**
+ * Suma 1 al contador de descargas de un ebook, vía una función RPC
+ * segura (el navegador nunca puede editar la fila directamente).
+ * "Fire and forget": si falla, no bloquea la descarga del usuario.
+ */
+async function incrementEbookDownloads(ebookId) {
+  if (!supabaseClient) return;
+  try {
+    await supabaseClient.rpc("increment_ebook_downloads", { ebook_id: ebookId });
+  } catch (err) {
+    console.warn("No se pudo sumar la descarga:", err.message);
+  }
 }
 
 /* =========================================================

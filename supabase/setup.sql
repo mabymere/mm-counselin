@@ -40,9 +40,33 @@ create table if not exists public.ebooks (
                                       -- solo se entrega después de un pago aprobado
   price numeric not null default 0,  -- 0 = gratis, >0 = va por Mercado Pago
   is_published boolean not null default true,
+  downloads_count int not null default 0,   -- contador de descargas/ventas
+  show_downloads boolean not null default false, -- mostrar el contador en la web pública
   position int not null default 0,   -- orden -> drag & drop del panel
   created_at timestamptz default now()
 );
+
+-- por si ya habías corrido este script antes de que existieran estas columnas
+alter table public.ebooks add column if not exists downloads_count int not null default 0;
+alter table public.ebooks add column if not exists show_downloads boolean not null default false;
+
+-- función que suma 1 a downloads_count de forma segura: el navegador
+-- (con la anon key) solo puede EJECUTAR esta función puntual, nunca
+-- editar la fila del ebook directamente.
+create or replace function public.increment_ebook_downloads(ebook_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.ebooks
+  set downloads_count = coalesce(downloads_count, 0) + 1
+  where id = ebook_id;
+end;
+$$;
+
+grant execute on function public.increment_ebook_downloads(uuid) to anon, authenticated, service_role;
 
 -- por si ya habías corrido este script antes de que existiera drive_url,
 -- o cuando file_url/file_path eran obligatorios

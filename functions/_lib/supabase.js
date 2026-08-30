@@ -46,6 +46,17 @@ export async function sbUpdate(env, table, filter, patch) {
   return res.json();
 }
 
+/** Llama a una función Postgres expuesta vía RPC (ej. increment_ebook_downloads). */
+export async function sbRpc(env, fn, args) {
+  const res = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method: "POST",
+    headers: headers(env),
+    body: JSON.stringify(args),
+  });
+  if (!res.ok) throw new Error(`Supabase rpc ${fn} falló: ${res.status} ${await res.text()}`);
+  return res.json().catch(() => null);
+}
+
 export function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,

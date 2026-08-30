@@ -202,11 +202,14 @@ revealEls.forEach(el => revealObserver.observe(el));
       <div class="ebook-body">
         <h3>${ebook.title}</h3>
         <p>${ebook.description || ""}</p>
-        ${
-          isPaid
-            ? `<button type="button" class="ebook-download ebook-buy-btn" data-ebook-id="${ebook.id}">Comprar${ebook.price ? ` · $${ebook.price}` : ""}</button>`
-            : `<a class="ebook-download" href="${ebook.file_url}" target="_blank" rel="noopener">Descargar</a>`
-        }
+        <div class="ebook-actions-row">
+          ${
+            isPaid
+              ? `<button type="button" class="ebook-download ebook-buy-btn" data-ebook-id="${ebook.id}">Comprar${ebook.price ? ` · $${ebook.price}` : ""}</button>`
+              : `<button type="button" class="ebook-download ebook-free-btn" data-ebook-id="${ebook.id}" data-file-url="${ebook.file_url}">Descargar</button>`
+          }
+          ${ebook.show_downloads ? `<span class="ebook-downloads-badge">${ebook.downloads_count || 0} descargas</span>` : ""}
+        </div>
       </div>
     `;
     grid.appendChild(card);
@@ -215,6 +218,13 @@ revealEls.forEach(el => revealObserver.observe(el));
 
   grid.querySelectorAll(".ebook-buy-btn").forEach((btn) => {
     btn.addEventListener("click", () => buyEbook(btn.dataset.ebookId, btn));
+  });
+
+  grid.querySelectorAll(".ebook-free-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      incrementEbookDownloads(btn.dataset.ebookId); // fire and forget, no bloquea la descarga
+      window.open(btn.dataset.fileUrl, "_blank", "noopener");
+    });
   });
 })();
 

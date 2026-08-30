@@ -214,6 +214,7 @@ function openEbookForm(ebook) {
   document.getElementById("ebook-price").value = ebook?.price || 0;
   document.getElementById("ebook-description").value = ebook?.description || "";
   document.getElementById("ebook-published").checked = ebook ? ebook.is_published !== false : true;
+  document.getElementById("ebook-show-downloads").checked = ebook ? !!ebook.show_downloads : false;
   document.getElementById("ebook-cover").value = "";
   document.getElementById("ebook-file").value = "";
   document.getElementById("ebook-drive-url").value = ebook?.drive_url || "";
@@ -235,6 +236,7 @@ async function submitEbookForm() {
   const price = parseFloat(document.getElementById("ebook-price").value) || 0;
   const description = document.getElementById("ebook-description").value.trim();
   const is_published = document.getElementById("ebook-published").checked;
+  const show_downloads = document.getElementById("ebook-show-downloads").checked;
   const coverFile = document.getElementById("ebook-cover").files[0];
   const bookFile = document.getElementById("ebook-file").files[0];
   const driveUrl = document.getElementById("ebook-drive-url").value.trim();
@@ -259,7 +261,7 @@ async function submitEbookForm() {
   saveBtn.disabled = true;
   saveBtn.textContent = "Guardando...";
 
-  const patch = { title, price, description, is_published };
+  const patch = { title, price, description, is_published, show_downloads };
   if (driveUrl) patch.drive_url = driveUrl;
 
   if (coverFile) {
@@ -333,7 +335,7 @@ function renderEbooks() {
       </div>
       <div class="ebook-item-body">
         <strong>${escapeHtml(ebook.title)}</strong>
-        <span>${ebook.price > 0 ? "$" + ebook.price : "Gratis"} · ${ebook.is_published === false ? "Oculto" : "Publicado"}</span>
+        <span>${ebook.price > 0 ? "$" + ebook.price : "Gratis"} · ${ebook.is_published === false ? "Oculto" : "Publicado"} · ${ebook.downloads_count || 0} descargas${ebook.show_downloads ? " (visible en la web)" : " (oculto en la web)"}</span>
       </div>
       <div class="ebook-item-actions">
         <label class="toggle">
