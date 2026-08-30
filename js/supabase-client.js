@@ -14,8 +14,8 @@
       login.html no permite registrarse: es un panel privado.
    ========================================================= */
 
-const SUPABASE_URL = "https://vvpvsclaextroldblltu.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cHZzY2xhZXh0cm9sZGJsbHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDY4MjUsImV4cCI6MjEwMzYyMjgyNX0.32kjThQX84W-O5X5OuNGtd986CUm7jnX8bdsW2J1h6k";
+const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
+const SUPABASE_ANON_KEY = "TU-ANON-KEY-PUBLICA";
 
 let supabaseClient = null;
 
@@ -233,4 +233,39 @@ async function fetchMessagesAdmin() {
     return [];
   }
   return data || [];
+}
+
+/* =========================================================
+   ADMIN — CUPONES DE DESCUENTO
+   ========================================================= */
+
+async function fetchAllCouponsAdmin() {
+  if (!supabaseClient) return [];
+  const { data, error } = await supabaseClient.from("coupons").select("*").order("created_at", { ascending: false });
+  if (error) {
+    console.warn("No se pudieron cargar los cupones:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+async function createCoupon(coupon) {
+  if (!supabaseClient) return { ok: false, reason: "not-configured" };
+  const { data, error } = await supabaseClient.from("coupons").insert([coupon]).select().single();
+  if (error) return { ok: false, reason: error.message };
+  return { ok: true, coupon: data };
+}
+
+async function updateCoupon(id, patch) {
+  if (!supabaseClient) return { ok: false, reason: "not-configured" };
+  const { error } = await supabaseClient.from("coupons").update(patch).eq("id", id);
+  if (error) return { ok: false, reason: error.message };
+  return { ok: true };
+}
+
+async function deleteCoupon(id) {
+  if (!supabaseClient) return { ok: false, reason: "not-configured" };
+  const { error } = await supabaseClient.from("coupons").delete().eq("id", id);
+  if (error) return { ok: false, reason: error.message };
+  return { ok: true };
 }

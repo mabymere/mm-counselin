@@ -44,8 +44,10 @@ let dragSourceIndex = null;
   wireTabs();
   wireSectionsPanel();
   wireEbooksPanel();
+  wireCouponsPanel();
 
   await Promise.all([loadSections(), loadEbooks(), loadMessages()]);
+  await loadCoupons(); // depende de ebooksState, por eso va después
 })();
 
 /* ---------------------------------------------------------
@@ -375,6 +377,145 @@ function renderEbooks() {
       if (!confirm(`¿Borrar "${ebook.title}"? Esta acción no se puede deshacer.`)) return;
       await deleteEbook(ebook);
       await loadEbooks();
+    });
+
+    list.appendChild(li);
+  });
+}
+
+/* ---------------------------------------------------------
+   CUPONES
+   --------------------------------------------------------- */
+let couponsState = [];
+
+function wireCouponsPanel() {
+  const form = document.getElementById("coupon-form");
+  document.getElementById("new-coupon-btn").addEventListener("click", () => openCouponForm(null));
+  document.getElementById("cancel-coupon-btn").addEventListener("click", () => closeCouponForm());
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await submitCouponForm();
+  });
+}
+
+function openCouponForm(coupon) {
+  const form = document.getElementById("coupon-form");
+  form.hidden = false;
+  document.getElementById("coupon-form-title").textContent = coupon ? "Editar cupón" : "Nuevo cupón";
+
+  document.getElementById("coupon-id").value = coupon?.id || "";
+  document.getElementById("coupon-code").value = coupon?.code || "";
+  document.getElementById("coupon-discount").value = coupon?.discount_percent || 100;
+  document.getElementById("coupon-max-uses").value = coupon?.max_uses ?? "";
+  document.getElementById("coupon-expires").value = coupon?.expires_at ? coupon.expires_at.slice(0, 10) : "";
+  document.getElementById("coupon-active").checked = coupon ? coupon.active !== false : true;
+
+  const select = document.getElementById("coupon-ebook");
+  select.innerHTML = `<option value="">Todos los ebooks pagos</option>`;
+  ebooksState
+    .filter((e) => e.price > 0)
+    .forEach((e) => {
+      const opt = document.createElement("option");
+      opt.value = e.id;
+      opt.textContent = e.title;
+      if (coupon?.ebook_id === e.id) opt.selected = true;
+      select.appendChild(opt);
+    });
+
+  document.getElementById("save-coupon-btn").textContent = coupon ? "Guardar cambios" : "Guardar cupón";
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function closeCouponForm() {
+  document.getElementById("coupon-form").hidden = true;
+  document.getElementById("coupon-form").reset();
+}
+
+async function submitCouponForm() {
+  const status = document.getElementById("coupon-form-status");
+  const saveBtn = document.getElementById("save-coupon-btn");
+  const id = document.getElementById("coupon-id").value || null;
+  const code = document.getElementById("coupon-code").value.trim().toUpperCase();
+  const discount_percent = parseInt(document.getElementById("coupon-discount").value, 10);
+  const ebook_id = document.getElementById("coupon-ebook").value || null;
+  const maxUsesRaw = document.getElementById("coupon-max-uses").value;
+  const max_uses = maxUsesRaw ? parseInt(maxUsesRaw, 10) : null;
+  const expiresRaw = document.getElementById("coupon-expires").value;
+  const expires_at = expiresRaw ? new Date(expiresRaw + "T23:59:59").toISOString() : null;
+  const active = document.getElementById("coupon-active").checked;
+
+  if (!code) {
+    showStatus(status, "Falta el código del cupón.", true);
+    return;
+  }
+  if (!discount_percent || discount_percent < 1 || discount_percent > 100) {
+    showStatus(status, "El descuento tiene que ser entre 1 y 100.", true);
+    return;
+  }
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Guardando...";
+
+  const patch = { code, discount_percent, ebook_id, max_uses, expires_at, active };
+  const result = id ? await updateCoupon(id, patch) : await createCoupon(patch);
+
+  saveBtn.disabled = false;
+  saveBtn.textContent = "Guardar cupón";
+
+  if (!result.ok) {
+    showStatus(status, "No se pudo guardar: " + result.reason, true);
+    return;
+  }
+
+  closeCouponForm();
+  await loadCoupons();
+}
+
+async function loadCoupons() {
+  couponsState = await fetchAllCouponsAdmin();
+  renderCoupons();
+}
+
+function renderCoupons() {
+  const list = document.getElementById("coupon-list");
+  list.innerHTML = "";
+
+  if (!couponsState.length) {
+    list.innerHTML = `<li class="empty-hint">Todavía no creaste ningún cupón.</li>`;
+    return;
+  }
+
+  couponsState.forEach((coupon) => {
+    const ebookTitle = coupon.ebook_id ? ebooksState.find((e) => e.id === coupon.ebook_id)?.title || "ebook eliminado" : "Todos los ebooks";
+    const usage = coupon.max_uses ? `${coupon.used_count}/${coupon.max_uses} usos` : `${coupon.used_count} usos (ilimitado)`;
+    const expired = coupon.expires_at && new Date(coupon.expires_at) < new Date();
+
+    const li = document.createElement("li");
+    li.className = "ebook-item" + (coupon.active === false || expired ? " is-unpublished" : "");
+    li.innerHTML = `
+      <div class="ebook-item-body">
+        <strong>${escapeHtml(coupon.code)} · ${coupon.discount_percent}% off</strong>
+        <span>${escapeHtml(ebookTitle)} · ${usage}${expired ? " · vencido" : ""}${coupon.active === false ? " · inactivo" : ""}</span>
+      </div>
+      <div class="ebook-item-actions">
+        <label class="toggle">
+          <input type="checkbox" data-action="toggle-active" ${coupon.active !== false ? "checked" : ""}>
+          <span class="toggle-track"></span>
+        </label>
+        <button type="button" class="link-btn" data-action="edit">Editar</button>
+        <button type="button" class="link-btn" data-action="delete">Borrar</button>
+      </div>
+    `;
+
+    li.querySelector('[data-action="toggle-active"]').addEventListener("change", async (e) => {
+      await updateCoupon(coupon.id, { active: e.target.checked });
+      await loadCoupons();
+    });
+    li.querySelector('[data-action="edit"]').addEventListener("click", () => openCouponForm(coupon));
+    li.querySelector('[data-action="delete"]').addEventListener("click", async () => {
+      if (!confirm(`¿Borrar el cupón "${coupon.code}"?`)) return;
+      await deleteCoupon(coupon.id);
+      await loadCoupons();
     });
 
     list.appendChild(li);

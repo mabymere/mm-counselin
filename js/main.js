@@ -205,7 +205,11 @@ revealEls.forEach(el => revealObserver.observe(el));
         <div class="ebook-actions-row">
           ${
             isPaid
-              ? `<button type="button" class="ebook-download ebook-buy-btn" data-ebook-id="${ebook.id}">Comprar${ebook.price ? ` · $${ebook.price}` : ""}</button>`
+              ? `<button type="button" class="ebook-download ebook-buy-btn" data-ebook-id="${ebook.id}">Comprar${ebook.price ? ` · $${ebook.price}` : ""}</button>
+                 <button type="button" class="ebook-coupon-toggle">¿Tenés un cupón?</button>
+                 <div class="ebook-coupon-box" hidden>
+                   <input type="text" class="ebook-coupon-input" placeholder="Código de cupón">
+                 </div>`
               : `<button type="button" class="ebook-download ebook-free-btn" data-ebook-id="${ebook.id}" data-file-url="${ebook.file_url}">Descargar</button>`
           }
           ${ebook.show_downloads ? `<span class="ebook-downloads-badge">${ebook.downloads_count || 0} descargas</span>` : ""}
@@ -217,7 +221,18 @@ revealEls.forEach(el => revealObserver.observe(el));
   });
 
   grid.querySelectorAll(".ebook-buy-btn").forEach((btn) => {
-    btn.addEventListener("click", () => buyEbook(btn.dataset.ebookId, btn));
+    btn.addEventListener("click", () => {
+      const couponInput = btn.closest(".ebook-actions-row").querySelector(".ebook-coupon-input");
+      buyEbook(btn.dataset.ebookId, btn, couponInput ? couponInput.value.trim() : "");
+    });
+  });
+
+  grid.querySelectorAll(".ebook-coupon-toggle").forEach((toggle) => {
+    toggle.addEventListener("click", () => {
+      const box = toggle.nextElementSibling;
+      box.hidden = !box.hidden;
+      if (!box.hidden) box.querySelector("input").focus();
+    });
   });
 
   grid.querySelectorAll(".ebook-free-btn").forEach((btn) => {
@@ -260,24 +275,28 @@ if (ebookLightbox) {
 }
 
 /**
- * Inicia el checkout de Mercado Pago para un ebook pago:
- * crea la preferencia en el backend (Cloudflare Function) y
- * redirige al checkout. La confirmación real llega después
- * por webhook, no acá.
+ * Inicia la compra de un ebook pago. Si hay un cupón válido de 100%,
+ * el backend aprueba directo y devuelve un link a gracias.html sin
+ * pasar por Mercado Pago. Si no, crea la preferencia y redirige al
+ * checkout con el precio ya descontado (si corresponde).
  */
-async function buyEbook(ebookId, btn) {
+async function buyEbook(ebookId, btn, couponCode) {
   const originalLabel = btn.textContent;
   btn.disabled = true;
-  btn.textContent = "Redirigiendo a Mercado Pago...";
+  btn.textContent = "Procesando...";
 
   try {
     const res = await fetch("/api/create-preference", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ebook_id: ebookId }),
+      body: JSON.stringify({ ebook_id: ebookId, coupon_code: couponCode || undefined }),
     });
     const data = await res.json();
 
+    if (data.free && data.redirect) {
+      window.location.href = data.redirect;
+      return;
+    }
     if (data.init_point) {
       window.location.href = data.init_point;
       return;
@@ -286,7 +305,7 @@ async function buyEbook(ebookId, btn) {
   } catch (err) {
     btn.disabled = false;
     btn.textContent = originalLabel;
-    alert("No se pudo iniciar el pago. Probá de nuevo en unos minutos.");
+    alert(err.message && err.message !== "Sin init_point" ? err.message : "No se pudo iniciar el pago. Probá de nuevo en unos minutos.");
   }
 }
 

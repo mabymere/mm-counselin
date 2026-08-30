@@ -33,6 +33,7 @@
     <nav class="admin-tabs" id="admin-tabs">
       <button class="admin-tab is-active" data-tab="sections">Secciones</button>
       <button class="admin-tab" data-tab="ebooks">Ebooks</button>
+      <button class="admin-tab" data-tab="coupons">Cupones</button>
       <button class="admin-tab" data-tab="messages">Mensajes</button>
     </nav>
 
@@ -123,6 +124,59 @@
       </form>
 
       <ul class="ebook-list" id="ebook-list"></ul>
+    </section>
+
+    <!-- ============ TAB: CUPONES ============ -->
+    <section class="admin-panel" id="panel-coupons">
+      <div class="admin-panel-head">
+        <div>
+          <h1>Cupones de descuento</h1>
+          <p>Creá códigos para descuentos parciales o del 100% (en ese caso, la persona pasa directo a descargar, sin pasar por Mercado Pago).</p>
+        </div>
+        <button class="btn btn-primary" id="new-coupon-btn">+ Nuevo cupón</button>
+      </div>
+
+      <form class="ebook-form" id="coupon-form" hidden>
+        <h3 class="ebook-form-title" id="coupon-form-title">Nuevo cupón</h3>
+        <input type="hidden" id="coupon-id">
+        <div class="form-row">
+          <label>
+            <span>Código</span>
+            <input type="text" id="coupon-code" placeholder="EJ: BIENVENIDA100" required style="text-transform:uppercase;">
+          </label>
+          <label>
+            <span>Descuento (%)</span>
+            <input type="number" id="coupon-discount" min="1" max="100" value="100" required>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            <span>Ebook (opcional — vacío = vale para todos)</span>
+            <select id="coupon-ebook"><option value="">Todos los ebooks pagos</option></select>
+          </label>
+          <label>
+            <span>Usos máximos (vacío = ilimitado)</span>
+            <input type="number" id="coupon-max-uses" min="1" placeholder="Ilimitado">
+          </label>
+        </div>
+        <label>
+          <span>Vence el (opcional)</span>
+          <input type="date" id="coupon-expires">
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="coupon-active" checked>
+          <span>Activo</span>
+        </label>
+
+        <p class="admin-status" id="coupon-form-status" hidden></p>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="cancel-coupon-btn">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="save-coupon-btn">Guardar cupón</button>
+        </div>
+      </form>
+
+      <ul class="ebook-list" id="coupon-list"></ul>
     </section>
 
     <!-- ============ TAB: MENSAJES ============ -->

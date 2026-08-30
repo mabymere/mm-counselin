@@ -86,10 +86,36 @@ create table if not exists public.purchases (
   status text not null default 'pending',  -- pending | approved | rejected
   mp_preference_id text,
   mp_payment_id text,
+  coupon_code text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
 alter table public.purchases enable row level security;
+alter table public.purchases add column if not exists coupon_code text;
+
+-- cupones de descuento. A diferencia de purchases, Mabel SÍ necesita
+-- crearlos/verlos desde el panel (autenticada, vía anon key + RLS),
+-- por eso tiene policy para "authenticated". El navegador de un
+-- comprador nunca puede leer la tabla completa: la validación del
+-- código se hace siempre del lado del servidor (Cloudflare Function
+-- con service_role), nunca directo desde el navegador del comprador.
+create table if not exists public.coupons (
+  id uuid primary key default gen_random_uuid(),
+  code text unique not null,
+  discount_percent int not null check (discount_percent > 0 and discount_percent <= 100),
+  ebook_id uuid references public.ebooks(id) on delete cascade, -- null = vale para todos los ebooks pagos
+  max_uses int,           -- null = ilimitado
+  used_count int not null default 0,
+  active boolean not null default true,
+  expires_at timestamptz, -- null = no vence
+  created_at timestamptz default now()
+);
+alter table public.coupons enable row level security;
+
+drop policy if exists "coupons_auth_all" on public.coupons;
+create policy "coupons_auth_all" on public.coupons
+  for all using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
 
 create table if not exists public.messages (
   id uuid primary key default gen_random_uuid(),
@@ -118,6 +144,12 @@ values
   ('faq',          'Preguntas frecuentes', 5, true),
   ('contact',      'Contacto',     6, true)
 on conflict (key) do nothing;
+
+-- por si ya habías corrido este script antes con el orden viejo
+-- (contact en 5, faq en 6): lo corregimos para que Preguntas
+-- frecuentes quede siempre antes que Contacto.
+update public.sections set position = 5 where key = 'faq';
+update public.sections set position = 6 where key = 'contact';
 
 -- =========================================================
 -- 3. ROW LEVEL SECURITY (RLS) — tablas
