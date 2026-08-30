@@ -135,6 +135,49 @@ revealEls.forEach(el => revealObserver.observe(el));
 })();
 
 /* =========================================================
+   LAYOUT DINÁMICO — orden, visibilidad y textos editados
+   desde el panel privado (admin.html)
+   ========================================================= */
+(async function applySectionsLayout() {
+  const root = document.getElementById("sections-root");
+  if (!root || typeof fetchSectionsLayout !== "function") return;
+
+  const sections = await fetchSectionsLayout();
+  if (!sections.length) return; // sin Supabase configurado: se queda el orden fijo del HTML
+
+  sections.forEach((s) => {
+    const el = root.querySelector(`[data-section="${s.key}"]`);
+    if (!el) return;
+
+    // visibilidad
+    el.style.display = s.visible === false ? "none" : "";
+
+    // contenido editable (título, bajada, etc.)
+    if (s.content && typeof s.content === "object") {
+      Object.entries(s.content).forEach(([field, value]) => {
+        if (!value) return;
+        const target = el.querySelector(`[data-field="${field}"]`);
+        if (!target) return;
+        if (target.hasAttribute("data-field-html")) {
+          target.innerHTML = value;
+        } else {
+          target.textContent = value;
+        }
+      });
+    }
+  });
+
+  // reordenar el DOM según "position"
+  sections
+    .slice()
+    .sort((a, b) => a.position - b.position)
+    .forEach((s) => {
+      const el = root.querySelector(`[data-section="${s.key}"]`);
+      if (el) root.appendChild(el);
+    });
+})();
+
+/* =========================================================
    EBOOKS — carga dinámica desde Supabase
    Si todavía no hay Supabase configurado o no hay ebooks
    publicados, se mantiene el estado vacío del HTML.

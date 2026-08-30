@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Panel privado · Mabel Mereles</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+</head>
+<body class="admin-body">
+
+<div id="admin-gate" class="admin-gate">Verificando sesión…</div>
+
+<div id="admin-app" class="admin-app" hidden>
+
+  <header class="admin-topbar">
+    <div class="admin-brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="26" height="26">
+          <path d="M20 33V19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M20 22C20 22 12 21.5 10 14C10 14 19 12.5 20 22Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M20 19C20 19 28 18 30 10C30 10 20.5 8 20 19Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" opacity="0.75"/>
+        </svg>
+      </span>
+      <span>Panel de Mabel</span>
+    </div>
+
+    <nav class="admin-tabs" id="admin-tabs">
+      <button class="admin-tab is-active" data-tab="sections">Secciones</button>
+      <button class="admin-tab" data-tab="ebooks">Ebooks</button>
+      <button class="admin-tab" data-tab="messages">Mensajes</button>
+    </nav>
+
+    <div class="admin-topbar-actions">
+      <a href="index.html" target="_blank" class="btn btn-ghost btn-sm">Ver la web</a>
+      <button class="btn btn-ghost btn-sm" id="logout-btn">Salir</button>
+    </div>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- ============ TAB: SECCIONES ============ -->
+    <section class="admin-panel is-active" id="panel-sections">
+      <div class="admin-panel-head">
+        <div>
+          <h1>Secciones de la web</h1>
+          <p>Arrastrá para reordenar, ocultá lo que no quieras mostrar y editá los textos principales de cada sección.</p>
+        </div>
+        <button class="btn btn-primary" id="save-sections-btn">Guardar cambios</button>
+      </div>
+
+      <p class="admin-status" id="sections-status" hidden></p>
+
+      <ul class="section-list" id="section-list"></ul>
+    </section>
+
+    <!-- ============ TAB: EBOOKS ============ -->
+    <section class="admin-panel" id="panel-ebooks">
+      <div class="admin-panel-head">
+        <div>
+          <h1>Ebooks</h1>
+          <p>Subí el material que va a aparecer en la sección de Ebooks de la web, en el orden que arrastres.</p>
+        </div>
+        <button class="btn btn-primary" id="new-ebook-btn">+ Nuevo ebook</button>
+      </div>
+
+      <form class="ebook-form" id="ebook-form" hidden>
+        <h3 class="ebook-form-title" id="ebook-form-title">Nuevo ebook</h3>
+        <input type="hidden" id="ebook-id">
+        <div class="form-row">
+          <label>
+            <span>Título</span>
+            <input type="text" id="ebook-title" required>
+          </label>
+          <label>
+            <span>Precio (0 = gratis)</span>
+            <input type="number" id="ebook-price" min="0" step="0.01" value="0">
+          </label>
+        </div>
+        <label>
+          <span>Descripción breve</span>
+          <textarea id="ebook-description" rows="2"></textarea>
+        </label>
+        <div class="form-row">
+          <label>
+            <span>Portada (imagen, opcional)</span>
+            <input type="file" id="ebook-cover" accept="image/*">
+          </label>
+          <label>
+            <span>Archivo del ebook (PDF/EPUB)</span>
+            <input type="file" id="ebook-file" accept=".pdf,.epub">
+          </label>
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="ebook-published" checked>
+          <span>Publicado (visible en la web)</span>
+        </label>
+
+        <p class="admin-status" id="ebook-form-status" hidden></p>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="cancel-ebook-btn">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="save-ebook-btn">Guardar ebook</button>
+        </div>
+      </form>
+
+      <ul class="ebook-list" id="ebook-list"></ul>
+    </section>
+
+    <!-- ============ TAB: MENSAJES ============ -->
+    <section class="admin-panel" id="panel-messages">
+      <div class="admin-panel-head">
+        <div>
+          <h1>Mensajes recibidos</h1>
+          <p>Lo que la gente escribió desde el formulario de contacto de la web.</p>
+        </div>
+      </div>
+
+      <ul class="message-list" id="message-list"></ul>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/admin-auth.js"></script>
+<script src="js/admin-app.js"></script>
+</body>
+</html>
