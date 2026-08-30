@@ -1005,6 +1005,8 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
 
   .approach-grid{ grid-template-columns:repeat(3,1fr); }
   .testimonial-grid{ grid-template-columns:repeat(3,1fr); }
+  .ebook-grid{ grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:1.4rem; }
+  .ebook-recover-toggle{ white-space:nowrap; }
 
   .contact-grid{
     flex-direction:row;
