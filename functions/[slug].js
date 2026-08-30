@@ -95,18 +95,24 @@ ${ebook.keywords ? `<meta name="keywords" content="${escapeHtml(ebook.keywords)}
 <link rel="canonical" href="${pageUrl}">
 <meta name="robots" content="index, follow">
 
-<meta property="og:type" content="product">
+<meta property="og:type" content="website">
 <meta property="og:locale" content="es_AR">
 <meta property="og:site_name" content="Mabel Mereles · Counselor">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${shortDesc || title}">
 <meta property="og:url" content="${pageUrl}">
-${coverUrl ? `<meta property="og:image" content="${coverUrl}">` : ""}
+${
+  coverUrl
+    ? `<meta property="og:image" content="${coverUrl}">
+<meta property="og:image:secure_url" content="${coverUrl}">
+<meta property="og:image:alt" content="Tapa de ${title}">`
+    : ""
+}
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${title}">
 <meta name="twitter:description" content="${shortDesc || title}">
-${coverUrl ? `<meta name="twitter:image" content="${coverUrl}">` : ""}
+${coverUrl ? `<meta name="twitter:image" content="${coverUrl}">\n<meta name="twitter:image:alt" content="Tapa de ${title}">` : ""}
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
