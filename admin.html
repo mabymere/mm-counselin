@@ -30,17 +30,23 @@
       <span>Panel de Mabel</span>
     </div>
 
-    <nav class="admin-tabs" id="admin-tabs">
-      <button class="admin-tab is-active" data-tab="sections">Secciones</button>
-      <button class="admin-tab" data-tab="ebooks">Ebooks</button>
-      <button class="admin-tab" data-tab="coupons">Cupones</button>
-      <button class="admin-tab" data-tab="messages">Mensajes</button>
-      <button class="admin-tab" data-tab="metrics">Métricas</button>
-    </nav>
+    <button class="admin-nav-toggle" id="admin-nav-toggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
 
-    <div class="admin-topbar-actions">
-      <a href="index.html" target="_blank" class="btn btn-ghost btn-sm">Ver la web</a>
-      <button class="btn btn-ghost btn-sm" id="logout-btn">Salir</button>
+    <div class="admin-menu" id="admin-menu">
+      <nav class="admin-tabs" id="admin-tabs">
+        <button class="admin-tab is-active" data-tab="sections">Secciones</button>
+        <button class="admin-tab" data-tab="ebooks">Ebooks</button>
+        <button class="admin-tab" data-tab="coupons">Cupones</button>
+        <button class="admin-tab" data-tab="messages">Mensajes</button>
+        <button class="admin-tab" data-tab="metrics">Métricas</button>
+      </nav>
+
+      <div class="admin-topbar-actions">
+        <a href="index.html" target="_blank" class="btn btn-ghost btn-sm">Ver la web</a>
+        <button class="btn btn-ghost btn-sm" id="logout-btn">Salir</button>
+      </div>
     </div>
   </header>
 
