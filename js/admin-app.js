@@ -401,7 +401,7 @@ function renderEbooks() {
 
   ebooksState.forEach((ebook, index) => {
     const li = document.createElement("li");
-    li.className = "ebook-item" + (ebook.is_published === false ? " is-unpublished" : "");
+    li.className = "ebook-item ebook-item-full" + (ebook.is_published === false ? " is-unpublished" : "");
     li.draggable = true;
     li.dataset.index = String(index);
 
