@@ -264,12 +264,22 @@
     <span class="eyebrow reveal">03 — Recursos</span>
     <h2 class="section-title reveal" data-field="title">Ebooks para tu proceso</h2>
 
-    <div class="ebook-grid" id="ebook-grid" data-dynamic="ebooks">
-      <!-- Se completa dinámicamente desde Supabase. Estado vacío por defecto: -->
-      <div class="ebook-empty" id="ebook-empty">
-        <p>Todavía no hay ebooks publicados.</p>
-        <span>Volvé pronto — voy a ir sumando material nuevo por acá.</span>
+    <div class="ebook-carousel">
+      <button type="button" class="ebook-carousel-arrow ebook-carousel-prev" id="ebook-scroll-prev" aria-label="Ver ebooks anteriores">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      <div class="ebook-grid" id="ebook-grid" data-dynamic="ebooks">
+        <!-- Se completa dinámicamente desde Supabase. Estado vacío por defecto: -->
+        <div class="ebook-empty" id="ebook-empty">
+          <p>Todavía no hay ebooks publicados.</p>
+          <span>Volvé pronto — voy a ir sumando material nuevo por acá.</span>
+        </div>
       </div>
+
+      <button type="button" class="ebook-carousel-arrow ebook-carousel-next" id="ebook-scroll-next" aria-label="Ver más ebooks">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
     </div>
   </section>
 

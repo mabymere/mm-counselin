@@ -285,7 +285,32 @@ revealEls.forEach(el => revealObserver.observe(el));
   grid.querySelectorAll(".ebook-cover[data-cover]").forEach((cover) => {
     cover.addEventListener("click", () => openEbookLightbox(cover.dataset.cover, cover.dataset.title));
   });
+
+  wireEbookCarousel(grid);
 })();
+
+/**
+ * Conecta las flechas de navegación del carrusel de ebooks y las
+ * oculta si no hace falta desplazarse (pocos ebooks, entran todos).
+ * En táctil ya se puede deslizar con el dedo de forma nativa.
+ */
+function wireEbookCarousel(grid) {
+  const prevBtn = document.getElementById("ebook-scroll-prev");
+  const nextBtn = document.getElementById("ebook-scroll-next");
+  if (!prevBtn || !nextBtn) return;
+
+  const updateArrows = () => {
+    const hasOverflow = grid.scrollWidth > grid.clientWidth + 4;
+    prevBtn.style.display = hasOverflow ? "" : "none";
+    nextBtn.style.display = hasOverflow ? "" : "none";
+  };
+
+  prevBtn.addEventListener("click", () => grid.scrollBy({ left: -grid.clientWidth * 0.85, behavior: "smooth" }));
+  nextBtn.addEventListener("click", () => grid.scrollBy({ left: grid.clientWidth * 0.85, behavior: "smooth" }));
+
+  updateArrows();
+  window.addEventListener("resize", updateArrows);
+}
 
 /* =========================================================
    PREVISUALIZACIÓN DE TAPA DE EBOOK (lightbox)
