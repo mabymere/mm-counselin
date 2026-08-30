@@ -508,6 +508,18 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   padding:.2rem .55rem;
   border-radius:100px;
 }
+.ebook-secure-badge{
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+  font-size:.68rem;
+  font-weight:600;
+  color:var(--ink-soft);
+  opacity:.85;
+  text-align:center;
+}
+.ebook-secure-badge svg{ flex:none; color:var(--aqua-deep); }
+
 .ebook-coupon-toggle{
   background:none;
   border:none;
