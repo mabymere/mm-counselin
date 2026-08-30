@@ -8,6 +8,10 @@
   min-height:100svh;
 }
 
+/* el atributo [hidden] debe ganarle siempre a cualquier display:flex/grid
+   que definamos más abajo para esos mismos elementos (admin-gate, ebook-form, etc.) */
+[hidden]{ display:none !important; }
+
 /* ---------- login ---------- */
 .login-body{
   display:flex;
