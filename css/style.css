@@ -434,16 +434,14 @@ textarea:focus-visible{
   display:flex;
   gap:.9rem;
   overflow-x:auto;
+  overflow-y:hidden;
   scroll-snap-type:x mandatory;
   scroll-behavior:smooth;
-  scrollbar-width:thin;
   -webkit-overflow-scrolling:touch;
-  padding-bottom:.4rem;
-  margin-bottom:-.4rem; /* compensa el padding-bottom para no mover el layout */
+  scrollbar-width:none;      /* Firefox */
+  -ms-overflow-style:none;   /* Edge/IE viejos */
 }
-.ebook-grid::-webkit-scrollbar{ height:6px; }
-.ebook-grid::-webkit-scrollbar-thumb{ background:var(--bone-deep); border-radius:10px; }
-.ebook-grid::-webkit-scrollbar-track{ background:transparent; }
+.ebook-grid::-webkit-scrollbar{ display:none; } /* Chrome/Safari/Edge nuevo */
 
 .ebook-carousel-arrow{
   position:absolute;
