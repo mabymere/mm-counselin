@@ -56,14 +56,46 @@ let dragSourceIndex = null;
    --------------------------------------------------------- */
 function wireTabs() {
   const tabs = document.querySelectorAll(".admin-tab");
+  const menu = document.getElementById("admin-menu");
+  const toggle = document.getElementById("admin-nav-toggle");
+  const validTabs = Array.from(tabs).map((t) => t.dataset.tab);
+
+  function activateTab(tabName, updateHash) {
+    const name = validTabs.includes(tabName) ? tabName : validTabs[0];
+    tabs.forEach((t) => t.classList.toggle("is-active", t.dataset.tab === name));
+    document.querySelectorAll(".admin-panel").forEach((p) => p.classList.remove("is-active"));
+    document.getElementById(`panel-${name}`).classList.add("is-active");
+    if (updateHash) history.replaceState(null, "", `#${name}`);
+  }
+
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
-      tabs.forEach((t) => t.classList.remove("is-active"));
-      tab.classList.add("is-active");
-      document.querySelectorAll(".admin-panel").forEach((p) => p.classList.remove("is-active"));
-      document.getElementById(`panel-${tab.dataset.tab}`).classList.add("is-active");
+      activateTab(tab.dataset.tab, true);
+      closeMobileMenu();
     });
   });
+
+  function closeMobileMenu() {
+    if (!menu) return;
+    menu.classList.remove("open");
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
+  }
+
+  if (toggle && menu) {
+    toggle.addEventListener("click", () => {
+      const isOpen = menu.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", String(isOpen));
+    });
+    document.addEventListener("click", (e) => {
+      if (menu.classList.contains("open") && !menu.contains(e.target) && e.target !== toggle && !toggle.contains(e.target)) {
+        closeMobileMenu();
+      }
+    });
+  }
+
+  // al cargar (o refrescar): respeta la pestaña que estaba abierta,
+  // guardada en el hash de la URL (#ebooks, #coupons, etc.)
+  activateTab(window.location.hash.replace("#", ""), false);
 }
 
 function showStatus(el, message, isError) {
