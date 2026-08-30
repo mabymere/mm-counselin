@@ -481,7 +481,8 @@ textarea:focus-visible{
 
 .ebook-card{
   flex:0 0 auto;
-  width:150px;
+  width:78vw;
+  max-width:300px;
   scroll-snap-align:start;
   background:var(--paper);
   border:1px solid var(--bone-deep);
