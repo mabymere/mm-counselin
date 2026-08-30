@@ -443,6 +443,72 @@
 .message-item p{ margin:0; font-size:.88rem; color:var(--ink-soft); line-height:1.5; }
 .message-item a{ color:var(--aqua-deep); font-weight:700; }
 
+/* ---------- métricas ---------- */
+.metrics-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:.8rem;
+  margin-bottom:2rem;
+}
+.metric-card{
+  background:var(--paper);
+  border:1px solid var(--bone-deep);
+  border-radius:14px;
+  padding:1.1rem 1.2rem;
+  display:flex;
+  flex-direction:column;
+  gap:.15rem;
+}
+.metric-card strong{
+  font-family:var(--font-display);
+  font-size:1.7rem;
+  color:var(--aqua-deep);
+  line-height:1.1;
+}
+.metric-card span{ font-size:.8rem; font-weight:700; color:var(--ink); }
+.metric-card small{ font-size:.72rem; color:var(--ink-soft); }
+
+.metrics-block{ margin-bottom:2rem; }
+.metrics-block h2{
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:1.1rem;
+  color:var(--olive-deep);
+  margin:0 0 1rem;
+}
+
+.metrics-sparkline{
+  display:flex;
+  align-items:flex-end;
+  gap:.35rem;
+  height:120px;
+  padding:0 .2rem;
+  border-bottom:1px solid var(--bone-deep);
+}
+.sparkline-bar{
+  flex:1;
+  min-width:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  align-items:center;
+  gap:.3rem;
+}
+.sparkline-fill{
+  width:100%;
+  max-width:22px;
+  background:var(--aqua-deep);
+  border-radius:4px 4px 0 0;
+  transition:background .2s;
+}
+.sparkline-bar:hover .sparkline-fill{ background:var(--olive-deep); }
+.sparkline-bar span{
+  font-size:.62rem;
+  color:var(--ink-soft);
+  white-space:nowrap;
+}
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
@@ -453,4 +519,5 @@
 @media (min-width:768px){
   .admin-topbar{ padding:1rem 1.8rem; }
   .admin-main{ padding:2.2rem 1.8rem 5rem; }
+  .metrics-grid{ grid-template-columns:repeat(3,1fr); }
 }

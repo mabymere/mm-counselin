@@ -35,6 +35,7 @@
       <button class="admin-tab" data-tab="ebooks">Ebooks</button>
       <button class="admin-tab" data-tab="coupons">Cupones</button>
       <button class="admin-tab" data-tab="messages">Mensajes</button>
+      <button class="admin-tab" data-tab="metrics">Métricas</button>
     </nav>
 
     <div class="admin-topbar-actions">
@@ -194,6 +195,28 @@
       </div>
 
       <ul class="message-list" id="message-list"></ul>
+    </section>
+
+    <!-- ============ TAB: MÉTRICAS ============ -->
+    <section class="admin-panel" id="panel-metrics">
+      <div class="admin-panel-head">
+        <div>
+          <h1>Métricas</h1>
+          <p>Visitas a la web, mensajes recibidos y descargas de cada ebook.</p>
+        </div>
+      </div>
+
+      <div class="metrics-grid" id="metrics-summary"></div>
+
+      <div class="metrics-block">
+        <h2>Visitas por día (últimos 14 días)</h2>
+        <div class="metrics-sparkline" id="metrics-sparkline"></div>
+      </div>
+
+      <div class="metrics-block">
+        <h2>Descargas por ebook</h2>
+        <ul class="ebook-list" id="metrics-ebooks-list"></ul>
+      </div>
     </section>
 
   </main>

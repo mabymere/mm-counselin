@@ -4,6 +4,20 @@
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
+/* ---------- métricas: registrar la visita, sin bloquear nada ---------- */
+(function trackVisit() {
+  try {
+    fetch("/api/track-visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: window.location.pathname }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch (err) {
+    /* si falla, no pasa nada visible para el visitante */
+  }
+})();
+
 /* ---------- fix de altura real de viewport en mobile ---------- */
 function setViewportHeight() {
   document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);

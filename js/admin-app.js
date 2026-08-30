@@ -48,6 +48,7 @@ let dragSourceIndex = null;
 
   await Promise.all([loadSections(), loadEbooks(), loadMessages()]);
   await loadCoupons(); // depende de ebooksState, por eso va después
+  await loadMetrics(); // también depende de ebooksState (descargas por ebook)
 })();
 
 /* ---------------------------------------------------------
@@ -559,6 +560,101 @@ function renderCoupons() {
 
     list.appendChild(li);
   });
+}
+
+/* ---------------------------------------------------------
+   MÉTRICAS
+   --------------------------------------------------------- */
+async function loadMetrics() {
+  const [visits, daily, messagesCount] = await Promise.all([
+    fetchVisitMetrics(),
+    fetchDailyVisits(14),
+    fetchMessagesCount(),
+  ]);
+  renderMetricsSummary(visits, messagesCount);
+  renderMetricsSparkline(daily);
+  renderMetricsEbooks();
+}
+
+function renderMetricsSummary(visits, messagesCount) {
+  const grid = document.getElementById("metrics-summary");
+  const v = visits || {
+    total_visits: 0,
+    unique_visitors: 0,
+    today_visits: 0,
+    today_unique: 0,
+    last_7d_visits: 0,
+    last_7d_unique: 0,
+    last_30d_visits: 0,
+    last_30d_unique: 0,
+  };
+
+  const cards = [
+    { label: "Visitantes únicos (total)", value: v.unique_visitors, hint: `${v.total_visits} visitas en total` },
+    { label: "Hoy", value: v.today_unique, hint: `${v.today_visits} visitas` },
+    { label: "Últimos 7 días", value: v.last_7d_unique, hint: `${v.last_7d_visits} visitas` },
+    { label: "Últimos 30 días", value: v.last_30d_unique, hint: `${v.last_30d_visits} visitas` },
+    { label: "Mensajes recibidos", value: messagesCount, hint: "vía formulario de contacto" },
+  ];
+
+  grid.innerHTML = cards
+    .map(
+      (c) => `
+      <div class="metric-card">
+        <strong>${c.value ?? 0}</strong>
+        <span>${c.label}</span>
+        <small>${c.hint}</small>
+      </div>`
+    )
+    .join("");
+}
+
+function renderMetricsSparkline(daily) {
+  const el = document.getElementById("metrics-sparkline");
+  if (!daily.length) {
+    el.innerHTML = `<p class="field-hint">Todavía no hay visitas registradas.</p>`;
+    return;
+  }
+
+  const max = Math.max(1, ...daily.map((d) => d.unique_visitors));
+  el.innerHTML = daily
+    .map((d) => {
+      const height = Math.max(6, Math.round((d.unique_visitors / max) * 100));
+      const dateLabel = new Date(d.day + "T00:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" });
+      return `
+        <div class="sparkline-bar" title="${dateLabel}: ${d.unique_visitors} únicos / ${d.visits} visitas">
+          <div class="sparkline-fill" style="height:${height}%"></div>
+          <span>${dateLabel}</span>
+        </div>`;
+    })
+    .join("");
+}
+
+function renderMetricsEbooks() {
+  const list = document.getElementById("metrics-ebooks-list");
+
+  if (!ebooksState.length) {
+    list.innerHTML = `<li class="empty-hint">Todavía no cargaste ningún ebook.</li>`;
+    return;
+  }
+
+  const sorted = [...ebooksState].sort((a, b) => (b.downloads_count || 0) - (a.downloads_count || 0));
+  const total = sorted.reduce((sum, e) => sum + (e.downloads_count || 0), 0);
+
+  list.innerHTML =
+    `<li class="empty-hint" style="text-align:left; border-style:solid;"><strong>${total}</strong> descargas/ventas en total, entre todos los ebooks.</li>` +
+    sorted
+      .map(
+        (e) => `
+      <li class="ebook-item">
+        <div class="ebook-item-cover">${e.cover_url ? `<img src="${e.cover_url}" alt="">` : ""}</div>
+        <div class="ebook-item-body">
+          <strong>${escapeHtml(e.title)}</strong>
+          <span>${e.downloads_count || 0} descargas${e.price > 0 ? " / ventas" : ""} · ${e.price > 0 ? "$" + e.price : "Gratis"}</span>
+        </div>
+      </li>`
+      )
+      .join("");
 }
 
 /* ---------------------------------------------------------

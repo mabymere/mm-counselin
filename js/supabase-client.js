@@ -227,6 +227,43 @@ async function deleteEbook(ebook) {
 }
 
 /* =========================================================
+   ADMIN — MÉTRICAS
+   ========================================================= */
+
+/** Trae los números resumen (visitas totales, únicos, hoy, 7d, 30d). */
+async function fetchVisitMetrics() {
+  if (!supabaseClient) return null;
+  const { data, error } = await supabaseClient.rpc("get_visit_metrics");
+  if (error) {
+    console.warn("No se pudieron cargar las métricas de visitas:", error.message);
+    return null;
+  }
+  return data;
+}
+
+/** Trae las visitas día por día (para el mini-gráfico). */
+async function fetchDailyVisits(days = 14) {
+  if (!supabaseClient) return [];
+  const { data, error } = await supabaseClient.rpc("get_daily_visits", { days });
+  if (error) {
+    console.warn("No se pudieron cargar las visitas diarias:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/** Cuenta total de mensajes recibidos (sin traer todas las filas). */
+async function fetchMessagesCount() {
+  if (!supabaseClient) return 0;
+  const { count, error } = await supabaseClient.from("messages").select("*", { count: "exact", head: true });
+  if (error) {
+    console.warn("No se pudo contar los mensajes:", error.message);
+    return 0;
+  }
+  return count || 0;
+}
+
+/* =========================================================
    ADMIN — MENSAJES DE CONTACTO
    ========================================================= */
 

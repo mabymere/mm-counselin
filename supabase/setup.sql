@@ -231,6 +231,61 @@ create policy "ebooks_bucket_auth_delete"
   using (bucket_id = 'ebooks' and auth.role() = 'authenticated');
 
 -- =========================================================
+-- =========================================================
+-- MÉTRICAS — visitas a la web (con IP hasheada, nunca en texto
+-- plano) y funciones de agregación para el panel. Estas funciones
+-- son SECURITY DEFINER (se saltan RLS por dentro) pero el EXECUTE
+-- solo está permitido para "authenticated" — o sea, solo Mabel
+-- logueada puede pedir estas métricas.
+-- =========================================================
+create table if not exists public.page_visits (
+  id uuid primary key default gen_random_uuid(),
+  ip_hash text not null,   -- hash de la IP, nunca la IP real
+  path text,
+  created_at timestamptz default now()
+);
+create index if not exists page_visits_created_at_idx on public.page_visits (created_at);
+create index if not exists page_visits_ip_hash_idx on public.page_visits (ip_hash);
+alter table public.page_visits enable row level security;
+-- sin policies públicas a propósito: solo el service_role (la
+-- Cloudflare Function que registra la visita) puede insertar.
+
+create or replace function public.get_visit_metrics()
+returns json
+language sql
+security definer
+set search_path = public
+as $$
+  select json_build_object(
+    'total_visits', (select count(*) from page_visits),
+    'unique_visitors', (select count(distinct ip_hash) from page_visits),
+    'today_visits', (select count(*) from page_visits where created_at >= date_trunc('day', now())),
+    'today_unique', (select count(distinct ip_hash) from page_visits where created_at >= date_trunc('day', now())),
+    'last_7d_visits', (select count(*) from page_visits where created_at >= now() - interval '7 days'),
+    'last_7d_unique', (select count(distinct ip_hash) from page_visits where created_at >= now() - interval '7 days'),
+    'last_30d_visits', (select count(*) from page_visits where created_at >= now() - interval '30 days'),
+    'last_30d_unique', (select count(distinct ip_hash) from page_visits where created_at >= now() - interval '30 days')
+  );
+$$;
+grant execute on function public.get_visit_metrics() to authenticated;
+
+create or replace function public.get_daily_visits(days int default 14)
+returns table(day date, visits bigint, unique_visitors bigint)
+language sql
+security definer
+set search_path = public
+as $$
+  select
+    date_trunc('day', created_at)::date as day,
+    count(*) as visits,
+    count(distinct ip_hash) as unique_visitors
+  from page_visits
+  where created_at >= now() - (days || ' days')::interval
+  group by 1
+  order by 1;
+$$;
+grant execute on function public.get_daily_visits(int) to authenticated;
+
 -- LISTO. Después de correr esto solo falta:
 --   a) Copiar Project URL + anon key (Project Settings → API)
 --      y pegarlas en js/supabase-client.js

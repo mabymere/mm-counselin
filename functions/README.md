@@ -35,6 +35,7 @@ Environment variables** (como "Secret" las que dicen secreto):
 | `SUPABASE_URL`                | Supabase → Project Settings → API → **Project URL**                           |
 | `SUPABASE_SERVICE_ROLE_KEY`   | Supabase → Project Settings → API → **service_role key**. (Secret, ¡nunca la anon key!) |
 | `SITE_URL`                    | La URL pública final del sitio, ej. `https://mabelmereles.com` (sin barra al final) |
+| `VISIT_HASH_SALT`             | Opcional. Cualquier texto random tuyo (ej. `asd8f7sd9f8`). Se usa para "mezclar" la IP de cada visitante antes de guardarla, así ni siquiera nosotros podemos reconstruir la IP real a partir de lo guardado. Si no la cargás, el sitio funciona igual con un valor por defecto. (Secret) |
 
 Importante: `SUPABASE_SERVICE_ROLE_KEY` es distinta de la `anon key`
 que usa `js/supabase-client.js`. La service_role se salta todos los
