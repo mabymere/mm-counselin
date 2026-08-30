@@ -487,6 +487,16 @@ textarea:focus-visible{
   cursor:pointer;
   transition:transform .25s var(--ease), background .25s, border-color .25s, color .25s, box-shadow .25s;
 }
+.ebook-view-more{
+  display:block;
+  text-align:center;
+  margin-top:.6rem;
+  font-size:.76rem;
+  font-weight:700;
+  color:var(--ink-soft);
+  transition:color .25s;
+}
+.ebook-view-more:hover{ color:var(--aqua-deep); }
 .ebook-buy-btn{
   background:var(--olive-deep);
   color:var(--bone);
@@ -717,6 +727,108 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   transition:background .25s;
 }
 .ebook-lightbox-close:hover{ background:rgba(246,241,231,.3); }
+
+/* ============ PÁGINA PROPIA DE UN EBOOK ============ */
+.back-bar{
+  max-width:var(--container);
+  margin:0 auto;
+  padding:6.5rem var(--edge) 0;
+}
+.back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  font-size:.85rem;
+  font-weight:700;
+  color:var(--ink-soft);
+}
+.back-link:hover{ color:var(--aqua-deep); }
+
+.ebook-detail{
+  display:flex;
+  flex-direction:column;
+  gap:2rem;
+  padding-top:2rem;
+}
+.ebook-detail-cover{
+  align-self:center;
+  width:min(260px, 60vw);
+  aspect-ratio:3/4;
+  border-radius:14px;
+  overflow:hidden;
+  background:linear-gradient(160deg, var(--aqua-soft), var(--bone-deep));
+  display:flex; align-items:center; justify-content:center;
+  cursor:zoom-in;
+  padding:.6rem;
+  box-shadow:0 24px 50px -24px rgba(43,46,34,.4);
+}
+.ebook-detail-cover img{ width:100%; height:100%; object-fit:contain; border-radius:6px; }
+
+.ebook-detail-info h1{
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:clamp(1.6rem, 4vw, 2.2rem);
+  color:var(--olive-deep);
+  margin:0 0 .6rem;
+  text-align:center;
+}
+.ebook-detail-price{
+  display:block;
+  text-align:center;
+  font-size:1.1rem;
+  font-weight:700;
+  color:var(--aqua-deep);
+  margin-bottom:1.2rem;
+}
+.ebook-detail-summary{
+  color:var(--ink-soft);
+  font-size:1rem;
+  line-height:1.7;
+  max-width:60ch;
+  margin:0 auto 1.6rem;
+}
+.ebook-detail-summary p{ margin:0 0 1rem; }
+.ebook-detail-summary p:last-child{ margin-bottom:0; }
+
+.ebook-detail-actions{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.6rem;
+  max-width:340px;
+  margin:0 auto;
+}
+.ebook-detail-actions .ebook-download{ width:100%; padding:.85rem 1rem; font-size:.92rem; }
+.ebook-detail-actions .ebook-coupon-box{ width:100%; }
+
+.ebook-not-found{
+  max-width:440px;
+  margin:8rem auto;
+  text-align:center;
+  padding:0 var(--edge);
+}
+.ebook-not-found h1{
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:1.6rem;
+  color:var(--olive-deep);
+  margin:0 0 .8rem;
+}
+.ebook-not-found p{ color:var(--ink-soft); margin:0 0 1.6rem; }
+
+@media (min-width:768px){
+  .ebook-detail{
+    flex-direction:row;
+    align-items:flex-start;
+    gap:3rem;
+  }
+  .ebook-detail-cover{ width:280px; flex:none; align-self:auto; }
+  .ebook-detail-info{ flex:1; padding-top:.5rem; }
+  .ebook-detail-info h1,
+  .ebook-detail-price,
+  .ebook-detail-summary{ text-align:left; margin-left:0; margin-right:0; }
+  .ebook-detail-actions{ align-items:flex-start; margin:0; }
+}
 
 /* ============ WHATSAPP FLOTANTE ============ */
 .whatsapp-float{

@@ -57,6 +57,16 @@ export async function sbRpc(env, fn, args) {
   return res.json().catch(() => null);
 }
 
+export function escapeHtml(str) {
+  return (str || "")
+    .toString()
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,

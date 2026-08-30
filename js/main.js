@@ -218,6 +218,7 @@ revealEls.forEach(el => revealObserver.observe(el));
           }
           ${ebook.show_downloads ? `<span class="ebook-downloads-badge">${ebook.downloads_count || 0} descargas</span>` : ""}
         </div>
+        ${ebook.slug ? `<a class="ebook-view-more" href="/${ebook.slug}">Ver más →</a>` : ""}
       </div>
     `;
     grid.appendChild(card);

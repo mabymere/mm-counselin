@@ -49,6 +49,16 @@ create table if not exists public.ebooks (
 -- por si ya habías corrido este script antes de que existieran estas columnas
 alter table public.ebooks add column if not exists downloads_count int not null default 0;
 alter table public.ebooks add column if not exists show_downloads boolean not null default false;
+alter table public.ebooks add column if not exists long_description text; -- resumen extendido, para la página propia del ebook
+alter table public.ebooks add column if not exists slug text unique;      -- ej: "como_poner_limites_sin_culpa" -> merelesmabel.com/como_poner_limites_sin_culpa
+
+-- para poder sacarle los acentos al generar el slug de los ebooks
+-- que ya existían antes de agregar esta columna
+create extension if not exists unaccent;
+
+update public.ebooks
+set slug = trim(both '_' from regexp_replace(lower(unaccent(title)), '[^a-z0-9]+', '_', 'g'))
+where slug is null;
 
 -- función que suma 1 a downloads_count de forma segura: el navegador
 -- (con la anon key) solo puede EJECUTAR esta función puntual, nunca

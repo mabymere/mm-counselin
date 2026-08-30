@@ -193,6 +193,17 @@ function wireSectionsPanel() {
 /* ---------------------------------------------------------
    EBOOKS
    --------------------------------------------------------- */
+/** Convierte un título en un slug de URL: "¿Cómo poner límites?" -> "como_poner_limites" */
+function slugify(text) {
+  return (text || "")
+    .toString()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // saca acentos
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
 function wireEbooksPanel() {
   const form = document.getElementById("ebook-form");
   const newBtn = document.getElementById("new-ebook-btn");
@@ -216,6 +227,7 @@ function openEbookForm(ebook) {
   document.getElementById("ebook-title").value = ebook?.title || "";
   document.getElementById("ebook-price").value = ebook?.price || 0;
   document.getElementById("ebook-description").value = ebook?.description || "";
+  document.getElementById("ebook-long-description").value = ebook?.long_description || "";
   document.getElementById("ebook-published").checked = ebook ? ebook.is_published !== false : true;
   document.getElementById("ebook-show-downloads").checked = ebook ? !!ebook.show_downloads : false;
   document.getElementById("ebook-cover").value = "";
@@ -223,7 +235,25 @@ function openEbookForm(ebook) {
   document.getElementById("ebook-drive-url").value = ebook?.drive_url || "";
   document.getElementById("save-ebook-btn").textContent = ebook ? "Guardar cambios" : "Guardar ebook";
 
+  updateSlugPreview(ebook?.slug || null);
+
   form.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/** Muestra qué URL va a tener (o ya tiene) la página propia del ebook. */
+function updateSlugPreview(existingSlug) {
+  const titleInput = document.getElementById("ebook-title");
+  const preview = document.getElementById("ebook-slug-preview");
+
+  const render = () => {
+    const slug = existingSlug || slugify(titleInput.value) || "titulo-del-ebook";
+    preview.textContent = existingSlug
+      ? `Página de este ebook: merelesmabel.com/${slug} (no cambia aunque edites el título)`
+      : `Se va a publicar en: merelesmabel.com/${slug}`;
+  };
+
+  render();
+  titleInput.oninput = existingSlug ? null : render;
 }
 
 function closeEbookForm() {
@@ -238,6 +268,7 @@ async function submitEbookForm() {
   const title = document.getElementById("ebook-title").value.trim();
   const price = parseFloat(document.getElementById("ebook-price").value) || 0;
   const description = document.getElementById("ebook-description").value.trim();
+  const long_description = document.getElementById("ebook-long-description").value.trim();
   const is_published = document.getElementById("ebook-published").checked;
   const show_downloads = document.getElementById("ebook-show-downloads").checked;
   const coverFile = document.getElementById("ebook-cover").files[0];
@@ -264,8 +295,9 @@ async function submitEbookForm() {
   saveBtn.disabled = true;
   saveBtn.textContent = "Guardando...";
 
-  const patch = { title, price, description, is_published, show_downloads };
+  const patch = { title, price, description, long_description, is_published, show_downloads };
   if (driveUrl) patch.drive_url = driveUrl;
+  if (!existing?.slug) patch.slug = slugify(title);
 
   if (coverFile) {
     const up = await uploadEbookFile(coverFile, "covers");
@@ -303,7 +335,14 @@ async function submitEbookForm() {
   saveBtn.textContent = "Guardar ebook";
 
   if (!result.ok) {
-    showStatus(status, "No se pudo guardar: " + result.reason, true);
+    const isSlugCollision = /slug/i.test(result.reason) && /duplicate|unique/i.test(result.reason);
+    showStatus(
+      status,
+      isSlugCollision
+        ? "Ya existe otro ebook con un título muy parecido (la URL quedaría repetida). Cambiá un poco el título."
+        : "No se pudo guardar: " + result.reason,
+      true
+    );
     return;
   }
 
