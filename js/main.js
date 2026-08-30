@@ -196,7 +196,7 @@ revealEls.forEach(el => revealObserver.observe(el));
     const card = document.createElement("article");
     card.className = "ebook-card reveal";
     card.innerHTML = `
-      <div class="ebook-cover">
+      <div class="ebook-cover" ${ebook.cover_url ? `data-cover="${ebook.cover_url}" data-title="${ebook.title}"` : ""}>
         ${ebook.cover_url ? `<img src="${ebook.cover_url}" alt="${ebook.title}" loading="lazy">` : ""}
       </div>
       <div class="ebook-body">
@@ -226,7 +226,38 @@ revealEls.forEach(el => revealObserver.observe(el));
       window.open(btn.dataset.fileUrl, "_blank", "noopener");
     });
   });
+
+  grid.querySelectorAll(".ebook-cover[data-cover]").forEach((cover) => {
+    cover.addEventListener("click", () => openEbookLightbox(cover.dataset.cover, cover.dataset.title));
+  });
 })();
+
+/* =========================================================
+   PREVISUALIZACIÓN DE TAPA DE EBOOK (lightbox)
+   ========================================================= */
+const ebookLightbox = document.getElementById("ebook-lightbox");
+const ebookLightboxImg = document.getElementById("ebook-lightbox-img");
+
+function openEbookLightbox(src, alt) {
+  if (!ebookLightbox) return;
+  ebookLightboxImg.src = src;
+  ebookLightboxImg.alt = alt || "";
+  ebookLightbox.hidden = false;
+}
+function closeEbookLightbox() {
+  if (!ebookLightbox) return;
+  ebookLightbox.hidden = true;
+  ebookLightboxImg.src = "";
+}
+if (ebookLightbox) {
+  document.getElementById("ebook-lightbox-close").addEventListener("click", closeEbookLightbox);
+  ebookLightbox.addEventListener("click", (e) => {
+    if (e.target === ebookLightbox) closeEbookLightbox();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !ebookLightbox.hidden) closeEbookLightbox();
+  });
+}
 
 /**
  * Inicia el checkout de Mercado Pago para un ebook pago:
