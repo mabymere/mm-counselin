@@ -42,13 +42,15 @@ function notFoundPage(siteUrl) {
 </html>`;
 }
 
-export async function onRequestGet({ params, env }) {
+export async function onRequestGet({ params, env, request }) {
   const slug = String(params.slug || "");
 
-  // rutas obviamente no-ebook (con extensión, favicon.ico, etc.) no
-  // pisan a Supabase, devuelven 404 rápido.
-  if (!slug || slug.includes(".")) {
-    return new Response("Not found", { status: 404 });
+  // rutas reservadas del sitio (con o sin extensión) nunca son un slug
+  // de ebook: se delegan a los archivos estáticos reales, tal como
+  // Cloudflare Pages los serviría si esta Function no existiera.
+  const RESERVED = new Set(["admin", "login", "gracias", "index", "favicon.ico", "robots.txt", "sitemap.xml"]);
+  if (!slug || slug.includes(".") || RESERVED.has(slug.toLowerCase())) {
+    return env.ASSETS.fetch(request);
   }
 
   const siteUrl = (env.SITE_URL || "").replace(/\/$/, "");
