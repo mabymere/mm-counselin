@@ -206,6 +206,10 @@ revealEls.forEach(el => revealObserver.observe(el));
           ${
             isPaid
               ? `<button type="button" class="ebook-download ebook-buy-btn" data-ebook-id="${ebook.id}">Comprar${ebook.price ? ` · $${ebook.price}` : ""}</button>
+                 <span class="ebook-secure-badge">
+                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                   Pago seguro a través de Mercado Pago
+                 </span>
                  <button type="button" class="ebook-coupon-toggle">¿Tenés un cupón?</button>
                  <div class="ebook-coupon-box" hidden>
                    <input type="text" class="ebook-coupon-input" placeholder="Código de cupón">
