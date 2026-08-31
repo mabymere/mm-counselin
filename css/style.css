@@ -810,6 +810,14 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   max-width:var(--container);
   margin:0 auto;
 }
+.footer-privacy-link{
+  color:var(--ink-soft);
+  opacity:.7;
+  font-size:.74rem;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+.footer-privacy-link:hover{ opacity:1; color:var(--aqua-deep); }
 
 /* ============ PREVISUALIZACIÓN DE TAPA (LIGHTBOX) ============ */
 .ebook-lightbox{
@@ -1145,7 +1153,7 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   .contact-grid > div,
   .contact-form{ flex:1; }
 
-  .site-footer{ flex-direction:row; justify-content:space-between; }
+  .site-footer{ flex-direction:row; justify-content:space-between; align-items:center; gap:1.5rem; }
 
   .whatsapp-float{ width:58px; height:58px; right:1.5rem; bottom:1.5rem; }
   .whatsapp-float svg{ width:30px; height:30px; }

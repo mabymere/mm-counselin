@@ -264,6 +264,24 @@ async function fetchMessagesCount() {
 }
 
 /* =========================================================
+   ADMIN — VENTAS
+   ========================================================= */
+
+/** Trae el historial de compras, con el título del ebook incluido. */
+async function fetchPurchasesAdmin() {
+  if (!supabaseClient) return [];
+  const { data, error } = await supabaseClient
+    .from("purchases")
+    .select("*, ebooks(title)")
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.warn("No se pudieron cargar las ventas:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/* =========================================================
    ADMIN — MENSAJES DE CONTACTO
    ========================================================= */
 

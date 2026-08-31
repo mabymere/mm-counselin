@@ -39,6 +39,7 @@
         <button class="admin-tab is-active" data-tab="sections">Secciones</button>
         <button class="admin-tab" data-tab="ebooks">Ebooks</button>
         <button class="admin-tab" data-tab="coupons">Cupones</button>
+        <button class="admin-tab" data-tab="sales">Ventas</button>
         <button class="admin-tab" data-tab="messages">Mensajes</button>
         <button class="admin-tab" data-tab="metrics">Métricas</button>
       </nav>
@@ -107,6 +108,16 @@
           (no se ven en la web, son solo para buscadores).
         </p>
         <p class="field-hint" id="ebook-slug-preview" style="margin:-.4rem 0 0;"></p>
+
+        <div class="seo-preview">
+          <span class="seo-preview-label">Así se vería en Google</span>
+          <div class="seo-preview-card">
+            <span class="seo-preview-url" id="seo-preview-url">merelesmabel.com › tu-ebook</span>
+            <span class="seo-preview-title" id="seo-preview-title">Título del ebook</span>
+            <span class="seo-preview-desc" id="seo-preview-desc">Acá va a aparecer la descripción breve que cargues arriba.</span>
+          </div>
+        </div>
+
         <div class="form-row">
           <label>
             <span>Portada (imagen, opcional)</span>
@@ -197,6 +208,20 @@
       </form>
 
       <ul class="ebook-list" id="coupon-list"></ul>
+    </section>
+
+    <!-- ============ TAB: VENTAS ============ -->
+    <section class="admin-panel" id="panel-sales">
+      <div class="admin-panel-head">
+        <div>
+          <h1>Ventas</h1>
+          <p>Historial de compras de tus ebooks: quién pagó, cuándo y cuánto.</p>
+        </div>
+      </div>
+
+      <div class="metrics-grid" id="sales-summary"></div>
+
+      <ul class="sale-list" id="sales-list"></ul>
     </section>
 
     <!-- ============ TAB: MENSAJES ============ -->

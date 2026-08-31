@@ -49,6 +49,7 @@ let dragSourceIndex = null;
   await Promise.all([loadSections(), loadEbooks(), loadMessages()]);
   await loadCoupons(); // depende de ebooksState, por eso va después
   await loadMetrics(); // también depende de ebooksState (descargas por ebook)
+  await loadSales();
 })();
 
 /* ---------------------------------------------------------
@@ -237,6 +238,52 @@ function slugify(text) {
     .replace(/^_+|_+$/g, "");
 }
 
+/**
+ * Achica y recomprime una imagen del lado del navegador antes de
+ * subirla (máx. 900px de lado más largo, JPEG calidad 82%). Evita
+ * subir fotos de varios MB tal cual, que encarecen el storage y
+ * hacen la web más lenta. Si algo falla, devuelve el archivo original.
+ */
+function compressImage(file, maxDimension = 900, quality = 0.82) {
+  return new Promise((resolve) => {
+    if (!file || !file.type.startsWith("image/")) return resolve(file);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return resolve(file);
+            resolve(new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" }));
+          },
+          "image/jpeg",
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
+
 function wireEbooksPanel() {
   const form = document.getElementById("ebook-form");
   const newBtn = document.getElementById("new-ebook-btn");
@@ -277,17 +324,30 @@ function openEbookForm(ebook) {
 /** Muestra qué URL va a tener (o ya tiene) la página propia del ebook. */
 function updateSlugPreview(existingSlug) {
   const titleInput = document.getElementById("ebook-title");
-  const preview = document.getElementById("ebook-slug-preview");
+  const descInput = document.getElementById("ebook-description");
+  const slugPreview = document.getElementById("ebook-slug-preview");
+  const seoUrl = document.getElementById("seo-preview-url");
+  const seoTitle = document.getElementById("seo-preview-title");
+  const seoDesc = document.getElementById("seo-preview-desc");
+
+  const currentSlug = () => existingSlug || slugify(titleInput.value) || "titulo-del-ebook";
 
   const render = () => {
-    const slug = existingSlug || slugify(titleInput.value) || "titulo-del-ebook";
-    preview.textContent = existingSlug
+    const slug = currentSlug();
+    slugPreview.textContent = existingSlug
       ? `Página de este ebook: merelesmabel.com/${slug} (no cambia aunque edites el título)`
       : `Se va a publicar en: merelesmabel.com/${slug}`;
+
+    const t = titleInput.value.trim() || "Título del ebook";
+    const d = descInput.value.trim() || "Acá va a aparecer la descripción breve que cargues arriba.";
+    seoUrl.textContent = `merelesmabel.com › ${slug}`;
+    seoTitle.textContent = t.length > 60 ? t.slice(0, 57) + "…" : t;
+    seoDesc.textContent = d.length > 160 ? d.slice(0, 157) + "…" : d;
   };
 
   render();
-  titleInput.oninput = existingSlug ? null : render;
+  titleInput.oninput = render;
+  descInput.oninput = render;
 }
 
 function closeEbookForm() {
@@ -335,7 +395,11 @@ async function submitEbookForm() {
   if (!existing?.slug) patch.slug = slugify(title);
 
   if (coverFile) {
-    const up = await uploadEbookFile(coverFile, "covers");
+    saveBtn.textContent = "Optimizando portada...";
+    const optimizedCover = await compressImage(coverFile);
+    saveBtn.textContent = "Guardando...";
+
+    const up = await uploadEbookFile(optimizedCover, "covers");
     if (!up.ok) {
       showStatus(status, "No se pudo subir la portada: " + up.reason, true);
       saveBtn.disabled = false;
@@ -594,6 +658,77 @@ function renderCoupons() {
 
     list.appendChild(li);
   });
+}
+
+/* ---------------------------------------------------------
+   VENTAS
+   --------------------------------------------------------- */
+const STATUS_LABELS = {
+  approved: "Aprobado",
+  pending: "Pendiente",
+  in_process: "En proceso",
+  rejected: "Rechazado",
+  cancelled: "Cancelado",
+};
+
+async function loadSales() {
+  const purchases = await fetchPurchasesAdmin();
+  renderSalesSummary(purchases);
+  renderSalesList(purchases);
+}
+
+function renderSalesSummary(purchases) {
+  const grid = document.getElementById("sales-summary");
+  const approved = purchases.filter((p) => p.status === "approved");
+  const pending = purchases.filter((p) => p.status === "pending" || p.status === "in_process");
+  const rejected = purchases.filter((p) => p.status === "rejected" || p.status === "cancelled");
+  const total = approved.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+
+  const cards = [
+    { label: "Total facturado", value: `$${total.toLocaleString("es-AR")}`, hint: `${approved.length} ventas aprobadas` },
+    { label: "Pendientes", value: pending.length, hint: "esperando confirmación" },
+    { label: "Rechazadas / canceladas", value: rejected.length, hint: "" },
+  ];
+
+  grid.innerHTML = cards
+    .map(
+      (c) => `
+      <div class="metric-card">
+        <strong>${c.value}</strong>
+        <span>${c.label}</span>
+        <small>${c.hint}</small>
+      </div>`
+    )
+    .join("");
+}
+
+function renderSalesList(purchases) {
+  const list = document.getElementById("sales-list");
+
+  if (!purchases.length) {
+    list.innerHTML = `<li class="empty-hint">Todavía no hay compras registradas.</li>`;
+    return;
+  }
+
+  list.innerHTML = purchases
+    .map((p) => {
+      const date = p.created_at ? new Date(p.created_at).toLocaleString("es-AR") : "";
+      const statusLabel = STATUS_LABELS[p.status] || p.status;
+      return `
+      <li class="sale-item">
+        <div class="sale-item-head">
+          <strong>${escapeHtml(p.ebooks?.title || "Ebook eliminado")}</strong>
+          <span class="sale-status sale-status--${escapeHtml(p.status)}">${statusLabel}</span>
+        </div>
+        <div class="sale-item-details">
+          <span><b>Monto:</b> $${Number(p.amount || 0).toLocaleString("es-AR")}</span>
+          <span><b>Email:</b> ${escapeHtml(p.payer_email || "—")}</span>
+          <span><b>Fecha:</b> ${date}</span>
+          ${p.coupon_code ? `<span><b>Cupón:</b> ${escapeHtml(p.coupon_code)}</span>` : ""}
+        </div>
+      </li>`;
+    })
+    .join("");
 }
 
 /* ---------------------------------------------------------

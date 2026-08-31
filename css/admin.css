@@ -332,6 +332,41 @@
 .section-fields textarea:focus{ outline:none; border-color:var(--aqua-deep); }
 .field-hint{ font-weight:500 !important; color:var(--ink-soft); opacity:.8; font-size:.72rem !important; margin-top:-.2rem; }
 
+/* ---------- vista previa de Google ---------- */
+.seo-preview{ margin:-.2rem 0 0; }
+.seo-preview-label{
+  display:block;
+  font-size:.72rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--ink-soft);
+  margin-bottom:.4rem;
+}
+.seo-preview-card{
+  background:#fff;
+  border:1px solid var(--bone-deep);
+  border-radius:10px;
+  padding:.9rem 1rem;
+  display:flex;
+  flex-direction:column;
+  gap:.15rem;
+  font-family:Arial, Helvetica, sans-serif; /* a propósito distinto: que se sienta como Google de verdad */
+}
+.seo-preview-url{ font-size:.8rem; color:#4d5156; }
+.seo-preview-title{
+  font-size:1.15rem;
+  color:#1a0dab;
+  line-height:1.3;
+  overflow-wrap:anywhere;
+}
+.seo-preview-desc{
+  font-size:.85rem;
+  color:#4d5156;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+
 /* ---------- toggle switch ---------- */
 .toggle{
   position:relative;
@@ -498,6 +533,50 @@
 .message-item-contact a{ color:var(--aqua-deep); font-weight:600; }
 .message-item p{ margin:0; font-size:.88rem; color:var(--ink-soft); line-height:1.5; }
 .message-item a{ color:var(--aqua-deep); font-weight:700; }
+
+/* ---------- ventas ---------- */
+.sale-list{
+  list-style:none;
+  margin:0; padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:.7rem;
+}
+.sale-item{
+  background:var(--paper);
+  border:1px solid var(--bone-deep);
+  border-radius:14px;
+  padding:.9rem 1.1rem;
+}
+.sale-item-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.6rem;
+  flex-wrap:wrap;
+  margin-bottom:.5rem;
+}
+.sale-item-head strong{ font-family:var(--font-display); font-size:.98rem; color:var(--ink); }
+.sale-status{
+  font-size:.7rem;
+  font-weight:700;
+  padding:.2rem .6rem;
+  border-radius:100px;
+  white-space:nowrap;
+}
+.sale-status--approved{ background:var(--aqua-soft); color:var(--aqua-deep); }
+.sale-status--pending,
+.sale-status--in_process{ background:#F6E9D2; color:#93650F; }
+.sale-status--rejected,
+.sale-status--cancelled{ background:#F6DEDA; color:#B4432D; }
+.sale-item-details{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.3rem 1.1rem;
+  font-size:.8rem;
+  color:var(--ink-soft);
+}
+.sale-item-details b{ color:var(--ink); font-weight:700; }
 
 /* ---------- métricas ---------- */
 .metrics-grid{

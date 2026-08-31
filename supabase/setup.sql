@@ -104,6 +104,13 @@ create table if not exists public.purchases (
 alter table public.purchases enable row level security;
 alter table public.purchases add column if not exists coupon_code text;
 
+-- Mabel (autenticada) puede LEER el historial de compras para el panel
+-- de Ventas. Sigue sin poder escribir/borrar desde el navegador — eso
+-- solo lo hacen las Cloudflare Functions con la service_role key.
+drop policy if exists "purchases_auth_read" on public.purchases;
+create policy "purchases_auth_read" on public.purchases
+  for select using (auth.role() = 'authenticated');
+
 -- cupones de descuento. A diferencia de purchases, Mabel SÍ necesita
 -- crearlos/verlos desde el panel (autenticada, vía anon key + RLS),
 -- por eso tiene policy para "authenticated". El navegador de un
