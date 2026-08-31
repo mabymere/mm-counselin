@@ -313,6 +313,86 @@ function wireEbookCarousel(grid) {
 }
 
 /* =========================================================
+   CARRUSEL INFINITO DE TESTIMONIOS
+   Gira solo (loop sin fin) y además se puede arrastrar con el
+   mouse o el dedo, en cualquier dirección, en cualquier momento.
+   ========================================================= */
+(function initTestimonialCarousel() {
+  const wrapper = document.querySelector(".testimonial-carousel");
+  const track = document.getElementById("testimonial-track");
+  if (!wrapper || !track) return;
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // duplicamos el set de tarjetas una vez: así, cuando el recorrido
+  // llega al final del primer set, reiniciar a 0 es visualmente
+  // idéntico (el loop no se nota) porque el segundo set es igual.
+  track.innerHTML += track.innerHTML;
+
+  let originalWidth = 0;
+  function measure() {
+    originalWidth = track.scrollWidth / 2;
+  }
+  measure();
+  window.addEventListener("resize", measure);
+
+  let position = 0; // px, siempre en el rango (-originalWidth, 0]
+  const speed = 0.4; // px por frame -> velocidad del giro automático
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartPosition = 0;
+
+  function wrap(pos) {
+    if (originalWidth <= 0) return pos;
+    const p = ((pos % originalWidth) + originalWidth) % originalWidth; // -> [0, originalWidth)
+    return p - originalWidth; // -> (-originalWidth, 0]
+  }
+
+  function applyTransform() {
+    track.style.transform = `translateX(${position}px)`;
+  }
+
+  function tick() {
+    if (!isDragging && !reduceMotion) {
+      position = wrap(position - speed);
+      applyTransform();
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  function pointerX(e) {
+    return e.touches ? e.touches[0].clientX : e.clientX;
+  }
+
+  function onPointerDown(e) {
+    isDragging = true;
+    track.classList.add("is-dragging");
+    dragStartX = pointerX(e);
+    dragStartPosition = position;
+  }
+  function onPointerMove(e) {
+    if (!isDragging) return;
+    const delta = pointerX(e) - dragStartX;
+    position = wrap(dragStartPosition + delta);
+    applyTransform();
+  }
+  function onPointerUp() {
+    isDragging = false;
+    track.classList.remove("is-dragging");
+  }
+
+  track.addEventListener("mousedown", onPointerDown);
+  window.addEventListener("mousemove", onPointerMove);
+  window.addEventListener("mouseup", onPointerUp);
+  track.addEventListener("dragstart", (e) => e.preventDefault());
+
+  track.addEventListener("touchstart", onPointerDown, { passive: true });
+  track.addEventListener("touchmove", onPointerMove, { passive: true });
+  track.addEventListener("touchend", onPointerUp);
+})();
+
+/* =========================================================
    PREVISUALIZACIÓN DE TAPA DE EBOOK (lightbox)
    ========================================================= */
 const ebookLightbox = document.getElementById("ebook-lightbox");
