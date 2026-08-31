@@ -48,7 +48,7 @@ export async function onRequestGet({ params, env, request }) {
   // rutas reservadas del sitio (con o sin extensión) nunca son un slug
   // de ebook: se delegan a los archivos estáticos reales, tal como
   // Cloudflare Pages los serviría si esta Function no existiera.
-  const RESERVED = new Set(["admin", "login", "gracias", "index", "favicon.ico", "robots.txt", "sitemap.xml"]);
+  const RESERVED = new Set(["admin", "login", "gracias", "index", "privacidad", "favicon.ico", "robots.txt", "sitemap.xml"]);
   if (!slug || slug.includes(".") || RESERVED.has(slug.toLowerCase())) {
     return env.ASSETS.fetch(request);
   }
