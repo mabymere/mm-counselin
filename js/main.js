@@ -237,6 +237,7 @@ revealEls.forEach(el => revealObserver.observe(el));
               : `<button type="button" class="ebook-download ebook-free-btn" data-ebook-id="${ebook.id}" data-file-url="${ebook.file_url}">Descargar</button>`
           }
           ${ebook.show_downloads ? `<span class="ebook-downloads-badge">${ebook.downloads_count || 0} descargas</span>` : ""}
+          <p class="ebook-terms-note">Al ${isPaid ? "comprar" : "descargar"} aceptás los <a href="terminos.html" target="_blank" rel="noopener">Términos y Condiciones</a></p>
         </div>
         ${ebook.slug ? `<a class="ebook-view-more" href="/${ebook.slug}">Ver más →</a>` : ""}
       </div>

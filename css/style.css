@@ -556,6 +556,17 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   padding:.2rem .55rem;
   border-radius:100px;
 }
+.ebook-terms-note{
+  width:100%;
+  text-align:center;
+  margin:.3rem 0 0;
+  font-size:.68rem;
+  color:var(--ink-soft);
+  opacity:.75;
+  line-height:1.4;
+}
+.ebook-terms-note a{ color:var(--ink-soft); text-decoration:underline; text-underline-offset:2px; }
+.ebook-terms-note a:hover{ color:var(--aqua-deep); }
 .ebook-secure-badge{
   display:flex;
   align-items:center;
@@ -818,6 +829,7 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   text-underline-offset:2px;
 }
 .footer-privacy-link:hover{ opacity:1; color:var(--aqua-deep); }
+.footer-legal-links{ display:flex; gap:1rem; }
 
 /* ============ PREVISUALIZACIÓN DE TAPA (LIGHTBOX) ============ */
 .ebook-lightbox{
@@ -1015,6 +1027,7 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   .ebook-detail-price,
   .ebook-detail-summary{ text-align:left; margin-left:0; margin-right:0; }
   .ebook-detail-actions{ align-items:flex-start; margin:0; }
+  .ebook-detail-actions .ebook-terms-note{ text-align:left; }
   .ebook-share{ justify-content:flex-start; }
   .ebook-share-menu{ left:0; transform:none; }
 }
