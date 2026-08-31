@@ -649,24 +649,51 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
 }
 .ebook-recover-status a{ color:var(--aqua-deep); font-weight:700; }
 
-/* ============ TESTIMONIOS ============ */
-.testimonial-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:1rem;
+/* ============ TESTIMONIOS (carrusel infinito) ============ */
+.testimonial-carousel{
+  position:relative;
   margin-top:2rem;
+  overflow:hidden;
 }
+/* degradé en los bordes: las tarjetas "se pierden" contra el fondo */
+.testimonial-carousel::before,
+.testimonial-carousel::after{
+  content:"";
+  position:absolute;
+  top:0; bottom:0;
+  width:14%;
+  min-width:24px;
+  max-width:90px;
+  z-index:2;
+  pointer-events:none;
+}
+.testimonial-carousel::before{
+  left:0;
+  background:linear-gradient(to right, var(--bone), rgba(246,241,231,0));
+}
+.testimonial-carousel::after{
+  right:0;
+  background:linear-gradient(to left, var(--bone), rgba(246,241,231,0));
+}
+
+.testimonial-track{
+  display:flex;
+  gap:1rem;
+  width:max-content;
+  cursor:grab;
+  -webkit-user-select:none;
+  user-select:none;
+  touch-action:pan-y;
+}
+.testimonial-track.is-dragging{ cursor:grabbing; }
+
 .testimonial-card{
+  flex:0 0 auto;
+  width:260px;
   background:var(--paper);
   border:1px solid var(--bone-deep);
   border-radius:var(--radius);
   padding:1.6rem 1.5rem;
-  transition:transform .4s var(--ease), border-color .4s, box-shadow .4s;
-}
-.testimonial-card:hover{
-  transform:translateY(-4px);
-  border-color:var(--aqua-deep);
-  box-shadow:0 18px 36px -24px rgba(79,132,116,.4);
 }
 .testimonial-card blockquote{
   margin:0 0 1rem;
@@ -675,6 +702,7 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   font-size:1.05rem;
   line-height:1.5;
   color:var(--olive-deep);
+  pointer-events:none; /* evita que seleccionar texto interfiera con el arrastre */
 }
 .testimonial-card cite{
   display:block;
@@ -685,6 +713,7 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   letter-spacing:.05em;
   text-transform:uppercase;
   color:var(--aqua-deep);
+  pointer-events:none;
 }
 
 /* ============ PREGUNTAS FRECUENTES ============ */
@@ -1016,7 +1045,7 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
 
   .hero-actions .btn{ flex:none; }
   .approach-grid{ grid-template-columns:repeat(2,1fr); }
-  .testimonial-grid{ grid-template-columns:repeat(2,1fr); }
+  .testimonial-card{ width:290px; }
   .ebook-grid{ gap:1.1rem; }
   .ebook-card{ width:190px; }
   .contact-grid .btn{ width:auto; }
@@ -1104,7 +1133,7 @@ button.ebook-download:disabled{ opacity:.6; cursor:default; transform:none !impo
   }
 
   .approach-grid{ grid-template-columns:repeat(3,1fr); }
-  .testimonial-grid{ grid-template-columns:repeat(3,1fr); }
+  .testimonial-card{ width:320px; }
   .ebook-grid{ grid-template-columns:unset; gap:1.4rem; }
   .ebook-card{ width:250px; }
   .ebook-recover-toggle{ white-space:nowrap; }
