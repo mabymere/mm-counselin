@@ -209,6 +209,12 @@ revealEls.forEach(el => revealObserver.observe(el));
     const isPaid = ebook.price && ebook.price > 0;
     const card = document.createElement("article");
     card.className = "ebook-card reveal";
+    if (ebook.slug) {
+      card.dataset.slug = ebook.slug;
+      card.tabIndex = 0;
+      card.setAttribute("role", "link");
+      card.setAttribute("aria-label", `Ver más sobre ${ebook.title}`);
+    }
     card.innerHTML = `
       <div class="ebook-cover" ${ebook.cover_url ? `data-cover="${ebook.cover_url}" data-title="${ebook.title}"` : ""}>
         ${ebook.cover_url ? `<img src="${ebook.cover_url}" alt="${ebook.title}" loading="lazy">` : ""}
@@ -285,6 +291,26 @@ revealEls.forEach(el => revealObserver.observe(el));
 
   grid.querySelectorAll(".ebook-cover[data-cover]").forEach((cover) => {
     cover.addEventListener("click", () => openEbookLightbox(cover.dataset.cover, cover.dataset.title));
+  });
+
+  // click en cualquier parte de la tarjeta -> va a la página del ebook,
+  // salvo que el click haya sido sobre la tapa (esa abre la previsualización)
+  // o sobre algún control interactivo (botón, link, input) que ya tiene su
+  // propia acción.
+  grid.querySelectorAll(".ebook-card[data-slug]").forEach((card) => {
+    const goToEbook = () => {
+      window.location.href = `/${card.dataset.slug}`;
+    };
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".ebook-cover, button, a, input")) return;
+      goToEbook();
+    });
+    card.addEventListener("keydown", (e) => {
+      if ((e.key === "Enter" || e.key === " ") && e.target === card) {
+        e.preventDefault();
+        goToEbook();
+      }
+    });
   });
 
   wireEbookCarousel(grid);
