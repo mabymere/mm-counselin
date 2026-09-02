@@ -50,6 +50,8 @@ let dragSourceIndex = null;
   await loadCoupons(); // depende de ebooksState, por eso va después
   await loadMetrics(); // también depende de ebooksState (descargas por ebook)
   await loadSales();
+
+  subscribeSalesRealtime();
 })();
 
 /* ---------------------------------------------------------
@@ -73,6 +75,7 @@ function wireTabs() {
     tab.addEventListener("click", () => {
       activateTab(tab.dataset.tab, true);
       closeMobileMenu();
+      if (tab.dataset.tab === "sales" && typeof hideSalesBadge === "function") hideSalesBadge();
     });
   });
 
@@ -675,6 +678,41 @@ async function loadSales() {
   const purchases = await fetchPurchasesAdmin();
   renderSalesSummary(purchases);
   renderSalesList(purchases);
+}
+
+/**
+ * Se suscribe a cambios en "purchases" vía Supabase Realtime. Cuando
+ * una compra queda aprobada (recién creada con cupón 100%, o
+ * actualizada por el webhook de Mercado Pago), prende el punto de
+ * notificación en la pestaña "Ventas" y refresca los datos, sin que
+ * haga falta recargar la página.
+ */
+function subscribeSalesRealtime() {
+  if (!supabaseClient) return;
+
+  supabaseClient
+    .channel("purchases-changes")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "purchases" },
+      (payload) => {
+        if (payload.new && payload.new.status === "approved") {
+          showSalesBadge();
+        }
+        loadSales(); // igual refrescamos los números para mantenerlos al día
+      }
+    )
+    .subscribe();
+}
+
+function showSalesBadge() {
+  const badge = document.getElementById("sales-badge");
+  if (badge) badge.hidden = false;
+}
+
+function hideSalesBadge() {
+  const badge = document.getElementById("sales-badge");
+  if (badge) badge.hidden = true;
 }
 
 function renderSalesSummary(purchases) {
