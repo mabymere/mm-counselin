@@ -175,6 +175,7 @@
   gap:.25rem;
 }
 .admin-tab{
+  position:relative;
   border:none;
   background:transparent;
   padding:.7rem .9rem;
@@ -189,6 +190,20 @@
 }
 .admin-tab:hover{ background:var(--bone-deep); }
 .admin-tab.is-active{ background:var(--olive-deep); color:var(--bone); }
+
+.tab-badge{
+  display:inline-block;
+  width:8px; height:8px;
+  border-radius:50%;
+  background:#D9714A;
+  margin-left:.4rem;
+  vertical-align:middle;
+  animation:tab-badge-pulse 1.6s ease-in-out infinite;
+}
+@keyframes tab-badge-pulse{
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%{ opacity:.55; transform:scale(1.4); }
+}
 
 .admin-topbar-actions{
   display:flex;
