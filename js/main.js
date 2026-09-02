@@ -207,6 +207,7 @@ revealEls.forEach(el => revealObserver.observe(el));
   emptyState.remove();
   ebooks.forEach((ebook) => {
     const isPaid = ebook.price && ebook.price > 0;
+    const hasSaleFlow = !!ebook.drive_url; // gratis o pago, pero con Drive: pasa por el "proceso de venta"
     const card = document.createElement("article");
     card.className = "ebook-card reveal";
     if (ebook.slug) {
@@ -224,20 +225,24 @@ revealEls.forEach(el => revealObserver.observe(el));
         <p>${ebook.description || ""}</p>
         <div class="ebook-actions-row">
           ${
-            isPaid
-              ? `<button type="button" class="ebook-download ebook-buy-btn" data-ebook-id="${ebook.id}">Comprar${ebook.price ? ` · $${ebook.price}` : ""}</button>
-                 <span class="ebook-secure-badge">
-                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-                   Pago seguro a través de Mercado Pago
-                 </span>
-                 <button type="button" class="ebook-coupon-toggle">¿Tenés un cupón?</button>
-                 <div class="ebook-coupon-box" hidden>
-                   <input type="text" class="ebook-coupon-input" placeholder="Código de cupón">
-                 </div>
-                 <button type="button" class="ebook-recover-toggle">¿Ya pagaste y no pudiste descargar?</button>
+            hasSaleFlow
+              ? `<button type="button" class="ebook-download ebook-buy-btn" data-ebook-id="${ebook.id}">${isPaid ? `Comprar · $${ebook.price}` : "Descargar"}</button>
+                 ${
+                   isPaid
+                     ? `<span class="ebook-secure-badge">
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                          Pago seguro a través de Mercado Pago
+                        </span>
+                        <button type="button" class="ebook-coupon-toggle">¿Tenés un cupón?</button>
+                        <div class="ebook-coupon-box" hidden>
+                          <input type="text" class="ebook-coupon-input" placeholder="Código de cupón">
+                        </div>`
+                     : ""
+                 }
+                 <button type="button" class="ebook-recover-toggle">${isPaid ? "¿Ya pagaste y no pudiste descargar?" : "¿Ya lo descargaste antes y perdiste el link?"}</button>
                  <div class="ebook-recover-box" hidden>
-                   <input type="email" class="ebook-recover-email" placeholder="Tu email de compra">
-                   <button type="button" class="ebook-recover-submit" data-ebook-id="${ebook.id}">Buscar mi compra</button>
+                   <input type="email" class="ebook-recover-email" placeholder="${isPaid ? "Tu email de compra" : "Tu email"}">
+                   <button type="button" class="ebook-recover-submit" data-ebook-id="${ebook.id}">Buscar mi descarga</button>
                    <p class="ebook-recover-status" hidden></p>
                  </div>`
               : `<button type="button" class="ebook-download ebook-free-btn" data-ebook-id="${ebook.id}" data-file-url="${ebook.file_url}">Descargar</button>`
@@ -455,7 +460,7 @@ async function recoverPurchase(ebookId, emailInput, statusEl, btn) {
   const email = emailInput.value.trim();
   if (!email) {
     statusEl.hidden = false;
-    statusEl.textContent = "Escribí el email que usaste para pagar.";
+    statusEl.textContent = "Escribí el email que usaste antes.";
     return;
   }
 
@@ -481,13 +486,13 @@ async function recoverPurchase(ebookId, emailInput, statusEl, btn) {
     btn.textContent = originalLabel;
     statusEl.hidden = false;
     statusEl.innerHTML =
-      'No encontramos ninguna compra aprobada con ese email para este ebook. Si ya pagaste, ' +
-      '<a href="https://wa.me/5491156472298" target="_blank" rel="noopener">escribinos por WhatsApp</a> con tu comprobante y te lo mandamos a mano.';
+      'No encontramos ninguna descarga con ese email para este ebook. Si ya lo tenías, ' +
+      '<a href="https://wa.me/5491156472298" target="_blank" rel="noopener">escribinos por WhatsApp</a> y te lo mandamos a mano.';
   } catch (err) {
     btn.disabled = false;
     btn.textContent = originalLabel;
     statusEl.hidden = false;
-    statusEl.textContent = "No se pudo buscar tu compra. Probá de nuevo en unos minutos.";
+    statusEl.textContent = "No se pudo buscar. Probá de nuevo en unos minutos.";
   }
 }
 

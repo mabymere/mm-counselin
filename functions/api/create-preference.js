@@ -2,15 +2,13 @@
    POST /api/create-preference
    Body: { ebook_id: string, payer_email?: string, coupon_code?: string }
 
-   1. Busca el ebook en Supabase (con la service_role key).
-   2. Si mandaron un cupón, lo valida server-side (nunca hay que
-      confiar en un descuento calculado en el navegador) y calcula
-      el precio final.
-   3. Si el precio final queda en $0 (cupón 100%), Mercado Pago no
-      puede procesar ese pago: se aprueba la compra directo acá y
-      se devuelve un link a gracias.html, sin pasar por MP.
-   4. Si no, crea la preferencia en Mercado Pago con el precio ya
-      descontado y devuelve el link de checkout (init_point).
+   Sirve para DOS casos con la misma lógica:
+   - Ebooks gratis con link de Google Drive: precio final = 0 desde
+     el arranque, se aprueban directo (como si fuera un cupón 100%).
+   - Ebooks pagos: con o sin cupón, si el precio final da $0 se
+     aprueban directo; si no, van a Mercado Pago. Si más adelante le
+     ponés precio a un ebook que antes era gratis, automáticamente
+     empieza a pedir el pago acá mismo, sin tocar nada más.
    ========================================================= */
 
 import { sbSelect, sbInsert, sbUpdate, sbRpc, json } from "../_lib/supabase.js";
@@ -47,30 +45,38 @@ export async function onRequestPost({ request, env }) {
     const ebooks = await sbSelect(env, "ebooks", `id=eq.${ebook_id}&select=*`);
     const ebook = ebooks[0];
     if (!ebook) return json({ error: "Ebook no encontrado" }, 404);
-    if (!ebook.price || ebook.price <= 0) return json({ error: "Este ebook no es pago" }, 400);
 
-    // ---- validar cupón (si mandaron uno) ----
-    const { coupon, error: couponError } = await findValidCoupon(env, coupon_code, ebook.id);
-    if (coupon_code && !coupon) return json({ error: couponError }, 400);
+    // ---- validar cupón (solo tiene sentido si el ebook es pago) ----
+    const shouldCheckCoupon = coupon_code && Number(ebook.price) > 0;
+    const { coupon, error: couponError } = shouldCheckCoupon
+      ? await findValidCoupon(env, coupon_code, ebook.id)
+      : { coupon: null, error: null };
+    if (shouldCheckCoupon && !coupon) return json({ error: couponError }, 400);
 
-    let finalPrice = Number(ebook.price);
+    let finalPrice = Number(ebook.price) || 0;
     if (coupon) {
       finalPrice = Math.round(finalPrice * (1 - coupon.discount_percent / 100) * 100) / 100;
     }
 
     const siteUrl = env.SITE_URL.replace(/\/$/, "");
 
-    // ---- cupón del 100%: no hay nada que cobrar, se aprueba directo ----
+    // ---- precio final $0 (ebook gratis, o cupón 100%): se aprueba directo ----
     if (finalPrice <= 0) {
+      if (!ebook.drive_url) {
+        return json({ error: "Este ebook todavía no tiene un archivo de descarga configurado" }, 400);
+      }
+
       const purchase = await sbInsert(env, "purchases", {
         ebook_id: ebook.id,
         payer_email: payer_email || null,
         amount: 0,
         status: "approved",
-        coupon_code: coupon.code,
+        coupon_code: coupon ? coupon.code : null,
       });
 
-      await sbUpdate(env, "coupons", `id=eq.${coupon.id}`, { used_count: coupon.used_count + 1 });
+      if (coupon) {
+        await sbUpdate(env, "coupons", `id=eq.${coupon.id}`, { used_count: coupon.used_count + 1 });
+      }
       await sbRpc(env, "increment_ebook_downloads", { ebook_id: ebook.id });
 
       return json({
@@ -79,7 +85,7 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
-    // ---- precio final > 0: sigue por Mercado Pago, como siempre ----
+    // ---- precio final > 0: sigue por Mercado Pago ----
     const purchase = await sbInsert(env, "purchases", {
       ebook_id: ebook.id,
       payer_email: payer_email || null,

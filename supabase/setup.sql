@@ -111,6 +111,15 @@ drop policy if exists "purchases_auth_read" on public.purchases;
 create policy "purchases_auth_read" on public.purchases
   for select using (auth.role() = 'authenticated');
 
+-- habilita Supabase Realtime en purchases: así el panel se entera al
+-- instante cuando el webhook aprueba un pago, sin recargar la página.
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.purchases;
+EXCEPTION WHEN duplicate_object THEN
+  NULL; -- ya estaba agregada, no pasa nada
+END $$;
+
 -- cupones de descuento. A diferencia de purchases, Mabel SÍ necesita
 -- crearlos/verlos desde el panel (autenticada, vía anon key + RLS),
 -- por eso tiene policy para "authenticated". El navegador de un

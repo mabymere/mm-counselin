@@ -385,8 +385,9 @@ async function submitEbookForm() {
     showStatus(status, "Es un ebook pago: falta el link privado de Google Drive.", true);
     return;
   }
-  if (!isPaid && !bookFile && !existing?.file_url) {
-    showStatus(status, "Es un ebook gratis: falta subir el archivo PDF/EPUB.", true);
+  const hasFreeContent = driveUrl || existing?.drive_url || bookFile || existing?.file_url;
+  if (!isPaid && !hasFreeContent) {
+    showStatus(status, "Es un ebook gratis: subí el archivo PDF/EPUB o pegá un link de Google Drive.", true);
     return;
   }
 

@@ -39,7 +39,7 @@
         <button class="admin-tab is-active" data-tab="sections">Secciones</button>
         <button class="admin-tab" data-tab="ebooks">Ebooks</button>
         <button class="admin-tab" data-tab="coupons">Cupones</button>
-        <button class="admin-tab" data-tab="sales">Ventas</button>
+        <button class="admin-tab" data-tab="sales">Ventas<span class="tab-badge" id="sales-badge" hidden></span></button>
         <button class="admin-tab" data-tab="messages">Mensajes</button>
         <button class="admin-tab" data-tab="metrics">Métricas</button>
       </nav>
@@ -124,18 +124,20 @@
             <input type="file" id="ebook-cover" accept="image/*">
           </label>
           <label>
-            <span>Archivo del ebook (PDF/EPUB) — solo si es gratis</span>
+            <span>Archivo del ebook (PDF/EPUB) — alternativa simple, solo para gratis</span>
             <input type="file" id="ebook-file" accept=".pdf,.epub">
           </label>
         </div>
         <label>
-          <span>Link privado de Google Drive — solo si es pago</span>
+          <span>Link privado de Google Drive</span>
           <input type="url" id="ebook-drive-url" placeholder="https://drive.google.com/file/d/.../view">
         </label>
         <p class="field-hint" style="margin:-.4rem 0 0;">
-          Si le ponés precio (arriba), no hace falta subir el archivo: cuando alguien
-          paga por Mercado Pago le mostramos este link de Drive. Si es gratis (precio 0),
-          subí el archivo PDF/EPUB en su lugar.
+          Si cargás un link de Drive, el ebook pasa por el mismo proceso que una compra
+          (queda registrado, cuenta como descarga/venta y se entrega desde "gracias.html")
+          — funciona así tanto si el precio es $0 como si le ponés un valor. La opción de
+          subir el archivo PDF/EPUB es solo para ebooks gratis, como descarga directa y
+          más simple, sin ese registro.
         </p>
         <label class="checkbox-row">
           <input type="checkbox" id="ebook-published" checked>

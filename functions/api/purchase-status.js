@@ -37,6 +37,7 @@ export async function onRequestGet({ request, env }) {
       title: ebook?.title || "",
       cover_url: ebook?.cover_url || "",
       drive_url: ebook?.drive_url || "",
+      amount: Number(purchase.amount) || 0,
     });
   } catch (err) {
     return json({ error: "Error interno", detail: String(err) }, 500);

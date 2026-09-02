@@ -72,9 +72,10 @@
   }
 
   function renderApproved(data) {
+    const isFree = !data.amount || data.amount <= 0;
     card.innerHTML = `
       <div class="result-icon">✓</div>
-      <h1>¡Gracias por tu compra!</h1>
+      <h1>${isFree ? "¡Ya está listo!" : "¡Gracias por tu compra!"}</h1>
       <p>Ya podés descargar <strong>${data.title || "tu ebook"}</strong>. El link es privado, guardalo para vos.</p>
       <a class="btn btn-primary" href="${data.drive_url}" target="_blank" rel="noopener">Descargar ebook</a>
       <a class="secondary" href="index.html#ebooks">Volver a la web</a>
