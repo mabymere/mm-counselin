@@ -237,7 +237,8 @@ revealEls.forEach(el => revealObserver.observe(el));
                         <div class="ebook-coupon-box" hidden>
                           <input type="text" class="ebook-coupon-input" placeholder="Código de cupón">
                         </div>`
-                     : ""
+                     : `<span class="ebook-secure-badge" style="visibility:hidden" aria-hidden="true">reservado</span>
+                        <button type="button" class="ebook-coupon-toggle" style="visibility:hidden" tabindex="-1" aria-hidden="true">reservado</button>`
                  }
                  <button type="button" class="ebook-recover-toggle">${isPaid ? "¿Ya pagaste y no pudiste descargar?" : "¿Ya lo descargaste antes y perdiste el link?"}</button>
                  <div class="ebook-recover-box" hidden>
