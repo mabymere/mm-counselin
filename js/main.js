@@ -219,6 +219,7 @@ revealEls.forEach(el => revealObserver.observe(el));
     card.innerHTML = `
       <div class="ebook-cover" ${ebook.cover_url ? `data-cover="${ebook.cover_url}" data-title="${ebook.title}"` : ""}>
         ${ebook.cover_url ? `<img src="${ebook.cover_url}" alt="${ebook.title}" loading="lazy">` : ""}
+        ${ebook.badge_enabled && ebook.badge_text ? `<div class="ebook-badge-ribbon" style="background:${ebook.badge_color || "#D6417A"}"><span>${ebook.badge_text}</span></div>` : ""}
       </div>
       <div class="ebook-body">
         <h3>${ebook.title}</h3>

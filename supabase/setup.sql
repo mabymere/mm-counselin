@@ -49,6 +49,9 @@ create table if not exists public.ebooks (
 -- por si ya habías corrido este script antes de que existieran estas columnas
 alter table public.ebooks add column if not exists downloads_count int not null default 0;
 alter table public.ebooks add column if not exists show_downloads boolean not null default false;
+alter table public.ebooks add column if not exists badge_enabled boolean not null default false; -- marcador tipo cintita sobre la tapa
+alter table public.ebooks add column if not exists badge_text text;    -- ej: "Nuevo", "10%"
+alter table public.ebooks add column if not exists badge_color text default '#D6417A';
 alter table public.ebooks add column if not exists long_description text; -- resumen extendido, para la página propia del ebook
 alter table public.ebooks add column if not exists slug text unique;      -- ej: "como_poner_limites_sin_culpa" -> merelesmabel.com/como_poner_limites_sin_culpa
 alter table public.ebooks add column if not exists keywords text;         -- palabras clave SEO, separadas por coma

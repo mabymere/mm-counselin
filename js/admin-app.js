@@ -295,9 +295,25 @@ function wireEbooksPanel() {
   newBtn.addEventListener("click", () => openEbookForm(null));
   cancelBtn.addEventListener("click", () => closeEbookForm());
 
+  document.getElementById("ebook-badge-enabled").addEventListener("change", (e) => {
+    document.getElementById("ebook-badge-fields").hidden = !e.target.checked;
+  });
+
+  document.querySelectorAll(".badge-color-swatch").forEach((swatch) => {
+    swatch.addEventListener("click", () => setBadgeColor(swatch.dataset.color));
+  });
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     await submitEbookForm();
+  });
+}
+
+/** Marca visualmente el color elegido y lo guarda en el input oculto. */
+function setBadgeColor(color) {
+  document.getElementById("ebook-badge-color").value = color;
+  document.querySelectorAll(".badge-color-swatch").forEach((swatch) => {
+    swatch.classList.toggle("is-selected", swatch.dataset.color.toLowerCase() === color.toLowerCase());
   });
 }
 
@@ -318,6 +334,11 @@ function openEbookForm(ebook) {
   document.getElementById("ebook-file").value = "";
   document.getElementById("ebook-drive-url").value = ebook?.drive_url || "";
   document.getElementById("save-ebook-btn").textContent = ebook ? "Guardar cambios" : "Guardar ebook";
+
+  document.getElementById("ebook-badge-enabled").checked = !!ebook?.badge_enabled;
+  document.getElementById("ebook-badge-text").value = ebook?.badge_text || "";
+  setBadgeColor(ebook?.badge_color || "#D6417A");
+  document.getElementById("ebook-badge-fields").hidden = !ebook?.badge_enabled;
 
   updateSlugPreview(ebook?.slug || null);
 
@@ -369,6 +390,9 @@ async function submitEbookForm() {
   const keywords = document.getElementById("ebook-keywords").value.trim();
   const is_published = document.getElementById("ebook-published").checked;
   const show_downloads = document.getElementById("ebook-show-downloads").checked;
+  const badge_enabled = document.getElementById("ebook-badge-enabled").checked;
+  const badge_text = document.getElementById("ebook-badge-text").value.trim();
+  const badge_color = document.getElementById("ebook-badge-color").value;
   const coverFile = document.getElementById("ebook-cover").files[0];
   const bookFile = document.getElementById("ebook-file").files[0];
   const driveUrl = document.getElementById("ebook-drive-url").value.trim();
@@ -394,7 +418,18 @@ async function submitEbookForm() {
   saveBtn.disabled = true;
   saveBtn.textContent = "Guardando...";
 
-  const patch = { title, price, description, long_description, keywords, is_published, show_downloads };
+  const patch = {
+    title,
+    price,
+    description,
+    long_description,
+    keywords,
+    is_published,
+    show_downloads,
+    badge_enabled,
+    badge_text,
+    badge_color,
+  };
   if (driveUrl) patch.drive_url = driveUrl;
   if (!existing?.slug) patch.slug = slugify(title);
 

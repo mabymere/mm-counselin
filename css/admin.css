@@ -421,6 +421,34 @@
   padding:1.2rem;
   margin-bottom:1.4rem;
 }
+.ebook-badge-fields{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+  margin-top:-.4rem;
+  padding:1rem;
+  background:var(--bone);
+  border-radius:10px;
+}
+.badge-color-picker{
+  display:flex;
+  gap:.6rem;
+  flex-wrap:wrap;
+}
+.badge-color-swatch{
+  width:30px; height:30px;
+  border-radius:50%;
+  border:2px solid transparent;
+  cursor:pointer;
+  padding:0;
+  transition:transform .2s, border-color .2s;
+}
+.badge-color-swatch:hover{ transform:scale(1.1); }
+.badge-color-swatch.is-selected{
+  border-color:var(--ink);
+  box-shadow:0 0 0 2px var(--paper);
+}
+
 .ebook-form-title{
   margin:0;
   font-family:var(--font-display);

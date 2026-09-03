@@ -148,6 +148,29 @@
           <span>Mostrar el contador de descargas en la web (vos siempre lo ves acá en el panel)</span>
         </label>
 
+        <label class="checkbox-row">
+          <input type="checkbox" id="ebook-badge-enabled">
+          <span>Mostrar un marcador sobre la portada (ej. "Nuevo", "10%")</span>
+        </label>
+        <div class="ebook-badge-fields" id="ebook-badge-fields" hidden>
+          <label>
+            <span>Texto del marcador</span>
+            <input type="text" id="ebook-badge-text" maxlength="12" placeholder="Nuevo">
+          </label>
+          <label>
+            <span>Color</span>
+            <div class="badge-color-picker" id="badge-color-picker">
+              <button type="button" class="badge-color-swatch" data-color="#D6417A" style="background:#D6417A" aria-label="Rosa"></button>
+              <button type="button" class="badge-color-swatch" data-color="#E08A3C" style="background:#E08A3C" aria-label="Naranja"></button>
+              <button type="button" class="badge-color-swatch" data-color="#E8C547" style="background:#E8C547" aria-label="Amarillo"></button>
+              <button type="button" class="badge-color-swatch" data-color="#6B9B5E" style="background:#6B9B5E" aria-label="Verde"></button>
+              <button type="button" class="badge-color-swatch" data-color="#4A90C2" style="background:#4A90C2" aria-label="Azul"></button>
+              <button type="button" class="badge-color-swatch" data-color="#565C39" style="background:#565C39" aria-label="Oliva (marca)"></button>
+            </div>
+            <input type="hidden" id="ebook-badge-color" value="#D6417A">
+          </label>
+        </div>
+
         <p class="admin-status" id="ebook-form-status" hidden></p>
 
         <div class="form-actions">

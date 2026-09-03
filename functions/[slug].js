@@ -181,6 +181,7 @@ ${coverUrl ? `<meta name="twitter:image" content="${coverUrl}">\n<meta name="twi
   <section class="section ebook-detail">
     <div class="ebook-detail-cover" ${coverUrl ? `data-cover="${coverUrl}" data-title="${title}"` : ""}>
       ${coverUrl ? `<img src="${coverUrl}" alt="${title}">` : ""}
+      ${ebook.badge_enabled && ebook.badge_text ? `<div class="ebook-badge-ribbon ebook-badge-ribbon--detail" style="background:${escapeHtml(ebook.badge_color || "#D6417A")}"><span>${escapeHtml(ebook.badge_text)}</span></div>` : ""}
     </div>
     <div class="ebook-detail-info">
       <h1>${title}</h1>
